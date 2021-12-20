@@ -127,6 +127,14 @@ public class Graph {
         }
     }
 
+    public void BFS() {
+
+    }
+
+    public void DFS() {
+    
+    }
+
     public static void main(String[] args) {
         Graph myGraph = new Graph(true);
     }

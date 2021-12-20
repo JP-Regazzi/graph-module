@@ -20,7 +20,7 @@ public class Graph {
     public Graph(boolean repChoice) {
         isMatrix = repChoice;
         ReadInputFile();
-        CalculateAtributes();
+        CalculateAttributes();
         PrintMatrix(matrix);
         WriteToOutputFile();
     }
@@ -50,7 +50,7 @@ public class Graph {
         }
     }
 
-    private void CalculateAtributes() {
+    private void CalculateAttributes() {
         minDegree = Collections.min(Arrays.asList(vertexDegrees));
         maxDegree = Collections.max(Arrays.asList(vertexDegrees));
         averageDegree = CalculateAverage();

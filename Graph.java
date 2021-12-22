@@ -28,7 +28,6 @@ public class Graph {
         isMatrix = repChoice;
         ReadInputFile();
         CalculateAttributes();
-        PrintMatrix(matrix);
         WriteToOutputFile();
     }
 
@@ -84,7 +83,7 @@ public class Graph {
 
 
 
-    private void WriteToOutputFile() {
+    public void WriteToOutputFile() {
         try {
             FileWriter myWriter = new FileWriter("Output.txt");
             myWriter.write("Number of vertices: " + vertexCount + "\n");
@@ -164,21 +163,22 @@ public class Graph {
 
     public void BFS(Integer origin) {
         LinkedList<Node> searchTree = new LinkedList<Node>();
-        if (isMatrix) {
-            markedVertices = new boolean[vertexCount];
-            LinkedList<Node> queue = new LinkedList<Node>();
+        markedVertices = new boolean[vertexCount];
+        LinkedList<Node> queue = new LinkedList<Node>();
 
-            markedVertices[origin - 1] = true;
-            Node currentNode = new Node(origin, null);
-            searchTree.add(currentNode);
-            queue.add(currentNode);
-            
+        markedVertices[origin - 1] = true;
+        Node currentNode = new Node(origin, null);
+        searchTree.add(currentNode);
+        queue.add(currentNode);
+        
 
-            while (queue.size() != 0) {
-                currentNode = queue.poll();
-                System.out.println("current vertex = " + currentNode.name);
+        while (queue.size() != 0) {
+            currentNode = queue.poll();
+            System.out.println("current vertex = " + currentNode.value);
+
+            if (isMatrix)  {
                 for (int i = 0; i < vertexCount; i++) {
-                    int n = matrix[currentNode.name - 1][i];
+                    int n = matrix[currentNode.value - 1][i];
                     if (n != 0 && !markedVertices[i]) {
                         markedVertices[i] = true;
                         Node newNode = new Node(i + 1, currentNode);
@@ -186,9 +186,17 @@ public class Graph {
                         searchTree.add(newNode);
                     }
                 }
+            } else {
+                for (Integer i : array.get(currentNode.value - 1)) {
+                     if (!markedVertices[i - 1]) {
+                        markedVertices[i - 1] = true;
+                        Node newNode = new Node(i, currentNode);
+                        queue.add(newNode);
+                        searchTree.add(newNode);
+                    }
+                }
             }
-        } else {
-            
+                
         }
         WriteToBfsFile(searchTree);
     }
@@ -196,8 +204,8 @@ public class Graph {
         try {
             FileWriter myWriter = new FileWriter("BFS search tree.txt");
             for (Node node : STree) {
-                myWriter.write("Node: " + node.name);
-                if (node.parent != null) myWriter.write(" Parent: " + node.parent.name);
+                myWriter.write("Node: " + node.value);
+                if (node.parent != null) myWriter.write(" Parent: " + node.parent.value);
                 else myWriter.write(" Parent: " + node.parent);
                 myWriter.write(" Depth = " + node.depth + "\n");
             }
@@ -226,9 +234,11 @@ public class Graph {
     }
 
     public static void main(String[] args) {
-        Graph myGraph = new Graph(true);
-        myGraph.BFS(1);
-        //myGraph.PrintArray(myGraph.array);
+        Graph myGraph = new Graph(false);
+        //myGraph.PrintMatrix(myGraph.matrix);
+        myGraph.PrintArray(myGraph.array);
+        myGraph.BFS(5);
+        
     }
 
 

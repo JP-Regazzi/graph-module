@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
 public class Test {
     boolean isMatrix;
     int[][] matrix;
-    Integer[][] vector;
+    ArrayList<ArrayList<Integer>> array;
     int vertexCount;
     int edgeCount;
     int minDegree;
@@ -28,7 +28,6 @@ public class Test {
         isMatrix = repChoice;
         ReadInputFile();
         CalculateAttributes();
-        PrintMatrix(matrix);
         WriteToOutputFile();
     }
 
@@ -44,6 +43,8 @@ public class Test {
 
             if (isMatrix) {
                 matrix = CreateMatrix();
+            } else { 
+                array = CreateArray();
             }
 
             while (myReader.hasNextLine()) { // Reads and creates edges from input file
@@ -105,6 +106,16 @@ public class Test {
         return matrix;
     }
 
+    private ArrayList<ArrayList<Integer>> CreateArray() {
+        ArrayList<ArrayList<Integer>> array = new ArrayList<ArrayList<Integer>> (vertexCount); // Create array and set it's size
+        for (int i = 0; i < vertexCount; i++) {
+            ArrayList<Integer> inner_array = new ArrayList<Integer> ();
+            array.add(inner_array);
+        }
+        return array;
+    }
+
+
     private void PrintMatrix(int[][] matrix) {
         System.out.print("\u001B[41m" + "  ");
         for (int i = 0; i < matrix.length; i++) {
@@ -120,9 +131,19 @@ public class Test {
         }
     }
 
+    private void PrintArray(ArrayList<ArrayList<Integer>> array) {
+        for (int i = 0; i < array.size(); i++) {
+            System.out.print(i+1 + "-> ");
+            for (int j = 0; j < array.get(i).size(); j++) {
+                System.out.print(array.get(i).get(j) + " ");
+            }
+            System.out.print("\n");
+        }
+    }
+
     private void AddEdge(int vertex1, int vertex2) {
         if (isMatrix) {
-            if (matrix[vertex1 - 1][vertex2 - 1] == 0) {
+            if (matrix[vertex1 - 1][vertex2 - 1] == 0 && vertex1 != vertex2) {
                 matrix[vertex1 - 1][vertex2 - 1] = 1;
                 matrix[vertex2 - 1][vertex1 - 1] = 1;
                 edgeCount++;
@@ -130,9 +151,13 @@ public class Test {
                 vertexDegrees[vertex2 - 1]++;
             }
         } else {
-           // if (! vector[vertex1 - 1].stream(arr).AnyMatch(x -> x= vertex1)) { // If vertex2 is not connected yet
-                //vector[0] = vertex2 //
-            //}
+            if (! array.get(vertex1 - 1).contains(vertex2) && vertex1 != vertex2) { // test if v1 and v2 are connected
+                array.get(vertex1 - 1).add(vertex2);
+                array.get(vertex2 - 1).add(vertex1);
+                edgeCount++;
+                vertexDegrees[vertex1 - 1]++;
+                vertexDegrees[vertex2 - 1]++;
+            }
         }
     }
 
@@ -201,7 +226,9 @@ public class Test {
 
     public static void main(String[] args) {
         Test myGraph = new Test(true);
-        myGraph.DFS(1);
+        myGraph.PrintMatrix(myGraph.matrix);
+        myGraph.BFS(1);
+        //myGraph.PrintArray(myGraph.array);
     }
 
 

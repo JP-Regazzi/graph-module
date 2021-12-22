@@ -1,10 +1,10 @@
 public class Node {
-    public int name;
+    public int value;
     public Node parent;
     public int depth;
 
-    public Node(int Name, Node Parent) {
-        name = Name;
+    public Node(int Value, Node Parent) {
+        value = Value;
         parent = Parent;
         depth = GetDepth();
     }

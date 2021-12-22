@@ -1,7 +1,7 @@
-Number of vertices: 5
-Number of edges: 5
-Minimum degree: 1
-Maximum degree: 4
-Average degree: 2.0
-Median degree: 2.0
+Number of vertices: 100
+Number of edges: 563
+Minimum degree: 5
+Maximum degree: 16
+Average degree: 11.26
+Median degree: 11.0
 Connected components: 

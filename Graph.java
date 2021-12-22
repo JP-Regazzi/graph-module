@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
 
 public class Graph {
     boolean isMatrix;
-    int[][] matrix;
+    boolean[][] matrix;
     ArrayList<ArrayList<Integer>> array;
     int vertexCount;
     int edgeCount;
@@ -27,8 +27,8 @@ public class Graph {
     public Graph(boolean repChoice) {
         isMatrix = repChoice;
         ReadInputFile();
-        CalculateAttributes();
-        WriteToOutputFile();
+        //CalculateAttributes();
+        //WriteToOutputFile();
     }
 
     private void ReadInputFile() {
@@ -101,8 +101,9 @@ public class Graph {
         }
     }
 
-    private int[][] CreateMatrix() {
-        int[][] matrix = new int[vertexCount][vertexCount];
+    private boolean[][] CreateMatrix() {
+        System.out.println("oi");
+        boolean[][] matrix = new boolean[vertexCount][vertexCount];
         return matrix;
     }
 
@@ -116,7 +117,7 @@ public class Graph {
     }
 
 
-    private void PrintMatrix(int[][] matrix) {
+    private void PrintMatrix(boolean[][] matrix) {
         System.out.print("\u001B[41m" + "  ");
         for (int i = 0; i < matrix.length; i++) {
             System.out.print(i + 1  + " ");
@@ -143,12 +144,12 @@ public class Graph {
 
     private void AddEdge(int vertex1, int vertex2) {
         if (isMatrix) {
-            if (matrix[vertex1 - 1][vertex2 - 1] == 0 && vertex1 != vertex2) {
-                matrix[vertex1 - 1][vertex2 - 1] = 1;
-                matrix[vertex2 - 1][vertex1 - 1] = 1;
+            if (matrix[vertex1 - 1][vertex2 - 1] == false && vertex1 != vertex2) {
+                matrix[vertex1 - 1][vertex2 - 1] = true;
+                matrix[vertex2 - 1][vertex1 - 1] = true;
                 edgeCount++;
-                vertexDegrees[vertex1 - 1]++;
-                vertexDegrees[vertex2 - 1]++;
+                //vertexDegrees[vertex1 - 1]++;
+                //vertexDegrees[vertex2 - 1]++;
             }
         } else {
             if (! array.get(vertex1 - 1).contains(vertex2) && vertex1 != vertex2) { // test if v1 and v2 are connected
@@ -174,12 +175,12 @@ public class Graph {
 
         while (queue.size() != 0) {
             currentNode = queue.poll();
-            System.out.println("current vertex = " + currentNode.value);
+            // System.out.println("current vertex = " + currentNode.value);
 
             if (isMatrix)  {
                 for (int i = 0; i < vertexCount; i++) {
-                    int n = matrix[currentNode.value - 1][i];
-                    if (n != 0 && !markedVertices[i]) {
+                    boolean n = matrix[currentNode.value - 1][i];
+                    if (n != false && !markedVertices[i]) {
                         markedVertices[i] = true;
                         Node newNode = new Node(i + 1, currentNode);
                         queue.add(newNode);
@@ -187,6 +188,7 @@ public class Graph {
                     }
                 }
             } else {
+                //Collections.sort(array.get(currentNode.value - 1));
                 for (Integer i : array.get(currentNode.value - 1)) {
                      if (!markedVertices[i - 1]) {
                         markedVertices[i - 1] = true;
@@ -226,8 +228,8 @@ public class Graph {
         System.out.println(origin);
 
         for (int i = 0; i < vertexCount; i++) {
-            int n = matrix[origin - 1][i];
-            if (n != 0 && !markedVertices[i]) {
+            boolean n = matrix[origin - 1][i];
+            if (n != false && !markedVertices[i]) {
                 ActualDFS(i + 1, visited);
             }
         }
@@ -236,8 +238,9 @@ public class Graph {
     public static void main(String[] args) {
         Graph myGraph = new Graph(false);
         //myGraph.PrintMatrix(myGraph.matrix);
-        myGraph.PrintArray(myGraph.array);
-        myGraph.BFS(5);
+        
+        // myGraph.PrintArray(myGraph.array);
+        myGraph.BFS(1); 
         
     }
 

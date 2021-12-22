@@ -33,7 +33,7 @@ public class Graph {
 
     private void ReadInputFile() {
         try {
-            File myObj = new File("grafo_4.txt");
+            File myObj = new File("Input.txt");
             Scanner myReader = new Scanner(myObj);
 
             vertexCount = Integer.valueOf(myReader.nextLine()); // Reads vertex count from input file
@@ -51,7 +51,7 @@ public class Graph {
                 String edge [] = myReader.nextLine().split(" ");
                 AddEdge(Integer.valueOf(edge[0]), Integer.valueOf(edge[1]));
             }
-
+            //liberar espaco de memoria de vertexDegrees
             myReader.close();
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
@@ -105,9 +105,9 @@ public class Graph {
         ArrayList<ArrayList<Boolean>> matrix = new ArrayList<ArrayList<Boolean>>(vertexCount);
         for (int i = 0; i < vertexCount; i++) {
             ArrayList<Boolean> inner_array = new ArrayList<Boolean>(vertexCount);
-            /*for (Boolean element : inner_array) {
-                element = false;
-            }*/
+            for (int j = 0; j < vertexCount; j++) {
+                inner_array.add(false);
+            }
             matrix.add(inner_array);
         }
         return matrix;
@@ -158,12 +158,12 @@ public class Graph {
                 //vertexDegrees[vertex2 - 1]++;
             }
         } else {
-            if (! array.get(vertex1 - 1).contains(vertex2) && vertex1 != vertex2) { // test if v1 and v2 are connected
+            if (! array.get(vertex1 - 1).contains(vertex2) && vertex1 != vertex2) { // Graph if v1 and v2 are connected
                 array.get(vertex1 - 1).add(vertex2);
                 array.get(vertex2 - 1).add(vertex1);
                 edgeCount++;
-                vertexDegrees[vertex1 - 1]++;
-                vertexDegrees[vertex2 - 1]++;
+                //vertexDegrees[vertex1 - 1]++;
+                //vertexDegrees[vertex2 - 1]++;
             }
         }
     }
@@ -206,11 +206,11 @@ public class Graph {
             }
                 
         }
-        WriteToBfsFile(searchTree);
+        WriteToTreeFile(searchTree, "BFS search tree.txt");
     }
-    private void WriteToBfsFile(LinkedList<Node> STree) {
+    private void WriteToTreeFile(LinkedList<Node> STree, String filename) {
         try {
-            FileWriter myWriter = new FileWriter("BFS search tree.txt");
+            FileWriter myWriter = new FileWriter(filename);
             for (Node node : STree) {
                 myWriter.write("Node: " + node.value);
                 if (node.parent != null) myWriter.write(" Parent: " + node.parent.value);
@@ -224,29 +224,51 @@ public class Graph {
         }
     }
     public void DFS(Integer origin) {
+        LinkedList<Node> searchTree = new LinkedList<Node>();
         markedVertices = new boolean[vertexCount];
-        ActualDFS(origin, markedVertices);
-    }
-    private void ActualDFS(Integer origin, boolean[] visited) {
-        
-
         markedVertices[origin - 1] = true;
-        System.out.println(origin);
+        Node rootNode = new Node(origin, null);
+        searchTree.add(rootNode);
+        ActualDFS(rootNode, markedVertices, searchTree);
+        
+        WriteToTreeFile(searchTree, "DFS search tree.txt");
+    }
+    private void ActualDFS(Node parentNode, boolean[] visited, LinkedList<Node> STree) {
 
-        for (int i = 0; i < vertexCount; i++) {
-            boolean n = matrix.get(origin - 1).get(i);
-            if (n != false && !markedVertices[i]) {
-                ActualDFS(i + 1, visited);
+        Node currentNode = parentNode;
+        
+        System.out.println(currentNode.value); //lolol
+        if (isMatrix) {
+            for (int i = 0; i < vertexCount; i++) {
+                boolean n = matrix.get(currentNode.value - 1).get(i);
+                if (n != false && !markedVertices[i]) {
+                    markedVertices[i] = true;
+                    Node newNode = new Node(i + 1, currentNode);
+                    STree.add(newNode);
+                    ActualDFS(newNode, markedVertices, STree);
+                }
+            }
+        }else {
+            for (Integer i : array.get(currentNode.value - 1)) {
+                if (!markedVertices[i - 1]) {
+                    markedVertices[i - 1] = true;
+                    Node newNode = new Node(i, currentNode);
+                    STree.add(newNode);
+                    ActualDFS(newNode, markedVertices, STree);
+                }
+                        
             }
         }
+        
+    
     }
 
     public static void main(String[] args) {
-        Graph myGraph = new Graph(true);
+        Graph myGraph = new Graph(false);
         //myGraph.PrintMatrix(myGraph.matrix);
         
         // myGraph.PrintArray(myGraph.array);
-        myGraph.BFS(1); 
+        myGraph.DFS(1); 
         
     }
 

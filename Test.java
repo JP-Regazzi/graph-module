@@ -113,10 +113,6 @@ public class Test {
         return matrix;
     }
 
-    private void SUPERCreateMatrix() {
-        ArrayList<Boolean> inner_array = new ArrayList<Boolean>(vertexCount);
-    }
-
     private ArrayList<ArrayList<Integer>> CreateArray() {
         ArrayList<ArrayList<Integer>> array = new ArrayList<ArrayList<Integer>> (vertexCount); // Create array and set it's size
         for (int i = 0; i < vertexCount; i++) {
@@ -272,7 +268,7 @@ public class Test {
         //myTest.PrintMatrix(myTest.matrix);
         
         // myTest.PrintArray(myTest.array);
-        myTest.DFS(1); 
+        myTest.BFS(1); 
         
     }
 

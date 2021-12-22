@@ -27,8 +27,8 @@ public class Graph {
     public Graph(boolean repChoice) {
         isMatrix = repChoice;
         ReadInputFile();
-        //CalculateAttributes();
-        //WriteToOutputFile();
+        CalculateAttributes();
+        WriteToOutputFile();
     }
 
     private void ReadInputFile() {
@@ -38,8 +38,8 @@ public class Graph {
 
             vertexCount = Integer.valueOf(myReader.nextLine()); // Reads vertex count from input file
 
-            //vertexDegrees = new Integer[vertexCount];
-            //for (int i = 0; i < vertexCount; i++) vertexDegrees[i] = 0;
+            vertexDegrees = new Integer[vertexCount];
+            for (int i = 0; i < vertexCount; i++) vertexDegrees[i] = 0;
 
             if (isMatrix) {
                 matrix = CreateMatrix();
@@ -62,15 +62,16 @@ public class Graph {
     private void CalculateAttributes() {
         minDegree = Collections.min(Arrays.asList(vertexDegrees));
         maxDegree = Collections.max(Arrays.asList(vertexDegrees));
+        //averageDegree = edgeCount*2/vertexCount;
         averageDegree = CalculateAverage();
         medianDegree = CalculateMedian();
     }
     private double CalculateAverage() {
         double sum = 0; //average will have decimal point
 
-        for(int i=0; i < vertexDegrees.length; i++) sum += Double.valueOf(vertexDegrees[i]);
+        for(int i=0; i < vertexCount; i++) sum += Double.valueOf(vertexDegrees[i]);
 
-        return sum/vertexDegrees.length;
+        return sum/vertexCount;
     
     }
     private double CalculateMedian() {
@@ -154,21 +155,21 @@ public class Graph {
                 matrix.get(vertex1 - 1).set(vertex2 - 1, true);
                 matrix.get(vertex2 - 1).set(vertex1 - 1, true);
                 edgeCount++;
-                //vertexDegrees[vertex1 - 1]++;
-                //vertexDegrees[vertex2 - 1]++;
+                vertexDegrees[vertex1 - 1]++;
+                vertexDegrees[vertex2 - 1]++;
             }
         } else {
             if (! array.get(vertex1 - 1).contains(vertex2) && vertex1 != vertex2) { // Graph if v1 and v2 are connected
                 array.get(vertex1 - 1).add(vertex2);
                 array.get(vertex2 - 1).add(vertex1);
                 edgeCount++;
-                //vertexDegrees[vertex1 - 1]++;
-                //vertexDegrees[vertex2 - 1]++;
+                vertexDegrees[vertex1 - 1]++;
+                vertexDegrees[vertex2 - 1]++;
             }
         }
     }
 
-    public void BFS(Integer origin) {
+    public LinkedList<Node> BFS(Integer origin) {
         LinkedList<Node> searchTree = new LinkedList<Node>();
         markedVertices = new boolean[vertexCount];
         LinkedList<Node> queue = new LinkedList<Node>();
@@ -181,7 +182,6 @@ public class Graph {
 
         while (queue.size() != 0) {
             currentNode = queue.poll();
-            // System.out.println("current vertex = " + currentNode.value);
 
             if (isMatrix)  {
                 for (int i = 0; i < vertexCount; i++) {
@@ -207,6 +207,7 @@ public class Graph {
                 
         }
         WriteToTreeFile(searchTree, "BFS search tree.txt");
+        return searchTree;
     }
     private void WriteToTreeFile(LinkedList<Node> STree, String filename) {
         try {
@@ -223,53 +224,73 @@ public class Graph {
             e.printStackTrace();
         }
     }
-    public void DFS(Integer origin) {
+    public LinkedList<Node> DFS(Integer origin) {
         LinkedList<Node> searchTree = new LinkedList<Node>();
-        markedVertices = new boolean[vertexCount];
-        markedVertices[origin - 1] = true;
-        Node rootNode = new Node(origin, null);
-        searchTree.add(rootNode);
-        ActualDFS(rootNode, markedVertices, searchTree);
-        
-        WriteToTreeFile(searchTree, "DFS search tree.txt");
-    }
-    private void ActualDFS(Node parentNode, boolean[] visited, LinkedList<Node> STree) {
+        markedVertices = new boolean[vertexCount]; // Desmarco todos os vertices
+        Stack<Node> s = new Stack<Node>(); // Crio a pilha
+        Node rootNode = new Node(origin, null); // Crio a raiz da arvore
+        s.push(rootNode); // Coloco a raiz na pilha
 
-        Node currentNode = parentNode;
-        
-        System.out.println(currentNode.value); //lolol
-        if (isMatrix) {
-            for (int i = 0; i < vertexCount; i++) {
-                boolean n = matrix.get(currentNode.value - 1).get(i);
-                if (n != false && !markedVertices[i]) {
-                    markedVertices[i] = true;
-                    Node newNode = new Node(i + 1, currentNode);
-                    STree.add(newNode);
-                    ActualDFS(newNode, markedVertices, STree);
+        while (! s.empty()) {
+
+            Node currentNode = s.pop();
+            if (!markedVertices[currentNode.value - 1]) {
+                markedVertices[currentNode.value - 1] = true;
+                searchTree.add(currentNode);
+                if (isMatrix){
+                    for (int i = 0; i < vertexCount; i++) {
+                        boolean n = matrix.get(currentNode.value - 1).get(i);
+                        if (n == true && !markedVertices[i]) {
+                            Node newNode = new Node(i + 1, currentNode);
+                            s.push(newNode);
+                        }
+                    }
+                } else {
+                    for (Integer neighbour : array.get(currentNode.value -1)) { // Itera por todos os vizinhos
+                        Node newNode = new Node(neighbour, currentNode);
+                        s.push(newNode);
+                    }
                 }
-            }
-        }else {
-            for (Integer i : array.get(currentNode.value - 1)) {
-                if (!markedVertices[i - 1]) {
-                    markedVertices[i - 1] = true;
-                    Node newNode = new Node(i, currentNode);
-                    STree.add(newNode);
-                    ActualDFS(newNode, markedVertices, STree);
-                }
-                        
             }
         }
-        
-    
+        WriteToTreeFile(searchTree, "DFS search tree.txt");
+        return searchTree;
     }
+
+    public int Distance(int vertex1, int vertex2) {
+        LinkedList<Node> tree = BFS(vertex1);
+        for (Node vertex : tree) {
+            if (vertex.value == vertex2) {
+                return vertex.depth;
+            }
+        }
+        return -1;
+    }
+
+    public int Diameter() {
+        int maxDist = 0;
+        for (int i = 1; i < vertexCount + 1; i++) {
+            LinkedList<Node> tree = BFS(i);
+            int dist = 0;
+            for (Node vertex : tree) {
+                if (vertex.depth > dist) dist = vertex.depth;
+            }
+            if (dist > maxDist) maxDist = dist;
+        }
+        return maxDist;
+    }
+
 
     public static void main(String[] args) {
         Graph myGraph = new Graph(false);
         //myGraph.PrintMatrix(myGraph.matrix);
         
         // myGraph.PrintArray(myGraph.array);
-        myGraph.DFS(1); 
-        
+        myGraph.DFS(1);
+        myGraph.BFS(1);
+
+        System.out.println(myGraph.Distance(1, 5));
+        System.out.println(myGraph.Diameter());
     }
 
 

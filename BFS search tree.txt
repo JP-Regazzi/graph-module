@@ -1,5 +1,5 @@
-Node: 1 Parent: null Depth = 0
-Node: 2 Parent: 1 Depth = 1
-Node: 5 Parent: 1 Depth = 1
-Node: 3 Parent: 5 Depth = 2
-Node: 4 Parent: 5 Depth = 2
+Node: 5 Parent: null Depth = 0
+Node: 2 Parent: 5 Depth = 1
+Node: 3 Parent: 5 Depth = 1
+Node: 4 Parent: 5 Depth = 1
+Node: 1 Parent: 5 Depth = 1

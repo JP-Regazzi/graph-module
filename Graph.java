@@ -33,7 +33,7 @@ public class Graph {
 
     private void ReadInputFile() {
         try {
-            File myObj = new File("grafo_1.txt");
+            File myObj = new File("grafo_4.txt");
             Scanner myReader = new Scanner(myObj);
 
             vertexCount = Integer.valueOf(myReader.nextLine()); // Reads vertex count from input file
@@ -86,6 +86,7 @@ public class Graph {
 
     public void WriteToOutputFile() {
         try {
+            ArrayList<ArrayList<Integer>> components = ConnectedComponents();
             FileWriter myWriter = new FileWriter("Output.txt");
             myWriter.write("Number of vertices: " + vertexCount + "\n");
             myWriter.write("Number of edges: " + edgeCount + "\n");
@@ -93,7 +94,26 @@ public class Graph {
             myWriter.write("Maximum degree: " + maxDegree + "\n");
             myWriter.write("Average degree: " + averageDegree + "\n");
             myWriter.write("Median degree: " + medianDegree + "\n");
+            myWriter.write("Number of connected components: " + components.size() + "\n");
             myWriter.write("Connected components: " + "\n");
+
+
+            myWriter.write(1 + "st component, size: " + components.get(0).size() + ", vertices:\n");
+            myWriter.write("[" + components.get(0).get(0));
+            for (int j = 1; j < components.get(0).size(); j++) {
+                myWriter.write(", " + components.get(0).get(j));
+            }
+            myWriter.write("]\n");
+            
+            for (int i = 1; i < components.size(); i++) {
+                ArrayList<Integer> tree = components.get(i);
+                myWriter.write(i + 1 + "th component, size: " + tree.size() + ", vertices:\n");
+                myWriter.write("[" + tree.get(0));
+                for (int j = 1; j < tree.size(); j++) {
+                    myWriter.write(", " + tree.get(j));
+                }
+                myWriter.write("]\n");
+            }
 
             myWriter.close();
         } catch (IOException e) {
@@ -267,28 +287,82 @@ public class Graph {
         return -1;
     }
 
-    public int Diameter() {
+    public int Diameter(boolean aprox) {
         int maxDist = 0;
-        for (int i = 1; i < vertexCount + 1; i++) {
-            LinkedList<Node> tree = BFS(i);
-            int dist = 0;
-            for (Node vertex : tree) {
-                if (vertex.depth > dist) dist = vertex.depth;
+        if (aprox) {
+            int k = (int)(Math.log(vertexCount)/Math.log(2));
+            Random r = new Random();
+            for (int i = 0; i < k; i++) {
+                int num = r.nextInt(vertexCount - 1) + 1;
+                LinkedList<Node> tree = BFS(num);
+                int dist = 0;
+                for (Node vertex : tree) {
+                    if (vertex.depth > dist) dist = vertex.depth;
+                }
+                if (dist > maxDist) maxDist = dist;
             }
-            if (dist > maxDist) maxDist = dist;
+
+        } else {
+            for (int i = 1; i < vertexCount + 1; i++) {
+                LinkedList<Node> tree = BFS(i);
+                int dist = 0;
+                for (Node vertex : tree) {
+                    if (vertex.depth > dist) dist = vertex.depth;
+                }
+                if (dist > maxDist) maxDist = dist;
+            }
         }
         return maxDist;
     }
 
+    public ArrayList<ArrayList<Integer>> ConnectedComponents() {
+        ArrayList<ArrayList<Integer>> components = new ArrayList<ArrayList<Integer>>();
+        boolean[] markedNodes = new boolean[vertexCount];
+        boolean isDone = false;
+        int s = 1;
+        while (!isDone) {
+            ArrayList<Integer> currentComponent = new ArrayList<Integer>();
+            components.add(currentComponent);
+            
+            BFS(s);
+            for (int i = 0; i < markedNodes.length; i++) {
+                if (markedVertices[i]) {
+                    markedNodes[i] = true;
+                    currentComponent.add(i + 1);
+                }
+            }
+
+            isDone = true;
+            for (int i = 0; i < markedNodes.length; i++) {
+                if (!markedNodes[i]) {
+                    isDone = false;
+                    s = i + 1;
+                }
+            }
+
+        }
+
+        Collections.sort(components, new Comparator<ArrayList>(){
+            public int compare(ArrayList a1, ArrayList a2) {
+                return a2.size() - a1.size();
+            }
+        });
+        return components;
+    }
+
+    
+
+
+
 
     public static void main(String[] args) {
-        Graph myGraph = new Graph(true);
+        Graph myGraph = new Graph(false);
         //myGraph.PrintMatrix(myGraph.matrix);
         
         // myGraph.PrintArray(myGraph.array);
         //myGraph.DFS(1);
         myGraph.BFS(1);
-
+        //myGraph.ConnectedComponents();
         //System.out.println(myGraph.Distance(1, 5));
         //System.out.println(myGraph.Diameter());
     }

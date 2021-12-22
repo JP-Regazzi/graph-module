@@ -137,9 +137,9 @@ public class Test {
     }
 
     public void BFS(Integer currentVertex) {
-
+        LinkedList<Node> searchTree = new LinkedList<Node>();
+        //int[] parents = new int[vertexCount];
         if (isMatrix) {
-            LinkedList<Node> searchTree = new LinkedList<Node>();
             markedVertices = new boolean[vertexCount];
             LinkedList<Integer> queue = new LinkedList<Integer>();
 
@@ -147,6 +147,7 @@ public class Test {
             queue.add(currentVertex);
             Node currentNode = new Node(currentVertex, null);
             searchTree.add(currentNode);
+
             while (queue.size() != 0) {
                 currentVertex = queue.poll();
                 System.out.println("current vertex = " + currentVertex);
@@ -155,15 +156,24 @@ public class Test {
                     if (n != 0 && !markedVertices[i]) {
                         markedVertices[i] = true;
                         queue.add(i + 1);
-                        currentNode = new Node(i + 1, currentNode);
-                        searchTree.add(currentNode);
+                        searchTree.add(new Node(i + 1, currentNode));
+                        //parents[i] = currentVertex;
                     }
                 }
             }
         } else {
-
+            
         }
-        
+        /*for (int i = 0; i < parents.length; i++) {
+            searchTree.add(new Node(i + 1, parents[i]));
+        }*/
+        for (Node node : searchTree) {
+            System.out.print("Node: " + node.name);
+            //System.out.print(" Parent: " + node.parent);
+            if (node.parent != null) System.out.print(" Parent: " + node.parent.name);
+            else System.out.print(" Parent: " + node.parent);
+            System.out.println(" Depth = " + node.depth);
+        }
     }
 
     public void DFS() {

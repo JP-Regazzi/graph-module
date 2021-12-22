@@ -136,43 +136,57 @@ public class Test {
         }
     }
 
-    public void BFS(Integer currentVertex) {
+    public void BFS(Integer origin) {
         LinkedList<Node> searchTree = new LinkedList<Node>();
-        //int[] parents = new int[vertexCount];
         if (isMatrix) {
             markedVertices = new boolean[vertexCount];
-            LinkedList<Integer> queue = new LinkedList<Integer>();
+            LinkedList<Node> queue = new LinkedList<Node>();
 
-            markedVertices[currentVertex - 1] = true;
-            queue.add(currentVertex);
-            Node currentNode = new Node(currentVertex, null);
+            markedVertices[origin - 1] = true;
+            Node currentNode = new Node(origin, null);
             searchTree.add(currentNode);
+            queue.add(currentNode);
+            
 
             while (queue.size() != 0) {
-                currentVertex = queue.poll();
-                System.out.println("current vertex = " + currentVertex);
+                currentNode = queue.poll();
+                System.out.println("current vertex = " + currentNode.name);
                 for (int i = 0; i < vertexCount; i++) {
-                    int n = matrix[currentVertex - 1][i];
+                    int n = matrix[currentNode.name - 1][i];
                     if (n != 0 && !markedVertices[i]) {
                         markedVertices[i] = true;
-                        queue.add(i + 1);
-                        searchTree.add(new Node(i + 1, currentNode));
-                        //parents[i] = currentVertex;
+                        Node newNode = new Node(i + 1, currentNode);
+                        queue.add(newNode);
+                        searchTree.add(newNode);
                     }
                 }
             }
         } else {
             
         }
-        /*for (int i = 0; i < parents.length; i++) {
-            searchTree.add(new Node(i + 1, parents[i]));
-        }*/
+
         for (Node node : searchTree) {
             System.out.print("Node: " + node.name);
-            //System.out.print(" Parent: " + node.parent);
             if (node.parent != null) System.out.print(" Parent: " + node.parent.name);
             else System.out.print(" Parent: " + node.parent);
             System.out.println(" Depth = " + node.depth);
+        }
+        WriteToBfsFile(searchTree);
+    }
+    private void WriteToBfsFile(LinkedList<Node> STree) {
+        try {
+            FileWriter myWriter = new FileWriter("BFS search tree.txt");
+            for (Node node : STree) {
+                myWriter.write("Node: " + node.name);
+                if (node.parent != null) myWriter.write(" Parent: " + node.parent.name);
+                else myWriter.write(" Parent: " + node.parent);
+                myWriter.write(" Depth = " + node.depth + "\n");
+            }
+
+            myWriter.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
         }
     }
 

@@ -5,15 +5,15 @@ import java.io.IOException;
 import java.io.FileWriter;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+//import java.util.List;
 import java.util.ArrayList;
-import java.io.*;
+//import java.io.*;
 import java.util.*;
-import java.util.stream.IntStream;
+//import java.util.stream.IntStream;
 
 public class Test {
     boolean isMatrix;
-    int[][] matrix;
+    ArrayList<ArrayList<Boolean>> matrix;
     ArrayList<ArrayList<Integer>> array;
     int vertexCount;
     int edgeCount;
@@ -27,8 +27,8 @@ public class Test {
     public Test(boolean repChoice) {
         isMatrix = repChoice;
         ReadInputFile();
-        CalculateAttributes();
-        WriteToOutputFile();
+        //CalculateAttributes();
+        //WriteToOutputFile();
     }
 
     private void ReadInputFile() {
@@ -38,8 +38,8 @@ public class Test {
 
             vertexCount = Integer.valueOf(myReader.nextLine()); // Reads vertex count from input file
 
-            vertexDegrees = new Integer[vertexCount];
-            for (int i = 0; i < vertexCount; i++) vertexDegrees[i] = 0;
+            //vertexDegrees = new Integer[vertexCount];
+            //for (int i = 0; i < vertexCount; i++) vertexDegrees[i] = 0;
 
             if (isMatrix) {
                 matrix = CreateMatrix();
@@ -51,7 +51,7 @@ public class Test {
                 String edge [] = myReader.nextLine().split(" ");
                 AddEdge(Integer.valueOf(edge[0]), Integer.valueOf(edge[1]));
             }
-
+            //liberar espaco de memoria de vertexDegrees
             myReader.close();
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
@@ -83,7 +83,7 @@ public class Test {
 
 
 
-    private void WriteToOutputFile() {
+    public void WriteToOutputFile() {
         try {
             FileWriter myWriter = new FileWriter("Output.txt");
             myWriter.write("Number of vertices: " + vertexCount + "\n");
@@ -101,22 +101,33 @@ public class Test {
         }
     }
 
-    private int[][] CreateMatrix() {
-        int[][] matrix = new int[vertexCount][vertexCount];
+    private ArrayList<ArrayList<Boolean>> CreateMatrix() {
+        ArrayList<ArrayList<Boolean>> matrix = new ArrayList<ArrayList<Boolean>>(vertexCount);
+        for (int i = 0; i < vertexCount; i++) {
+            ArrayList<Boolean> inner_array = new ArrayList<Boolean>(vertexCount);
+            for (int j = 0; j < vertexCount; j++) {
+                inner_array.add(false);
+            }
+            matrix.add(inner_array);
+        }
         return matrix;
+    }
+
+    private void SUPERCreateMatrix() {
+        ArrayList<Boolean> inner_array = new ArrayList<Boolean>(vertexCount);
     }
 
     private ArrayList<ArrayList<Integer>> CreateArray() {
         ArrayList<ArrayList<Integer>> array = new ArrayList<ArrayList<Integer>> (vertexCount); // Create array and set it's size
         for (int i = 0; i < vertexCount; i++) {
-            ArrayList<Integer> inner_array = new ArrayList<Integer> ();
+            ArrayList<Integer> inner_array = new ArrayList<Integer>();
             array.add(inner_array);
         }
         return array;
     }
 
 
-    private void PrintMatrix(int[][] matrix) {
+    private void PrintMatrix(boolean[][] matrix) {
         System.out.print("\u001B[41m" + "  ");
         for (int i = 0; i < matrix.length; i++) {
             System.out.print(i + 1  + " ");
@@ -143,60 +154,70 @@ public class Test {
 
     private void AddEdge(int vertex1, int vertex2) {
         if (isMatrix) {
-            if (matrix[vertex1 - 1][vertex2 - 1] == 0 && vertex1 != vertex2) {
-                matrix[vertex1 - 1][vertex2 - 1] = 1;
-                matrix[vertex2 - 1][vertex1 - 1] = 1;
+            if (matrix.get(vertex1 - 1).get(vertex2 - 1) == false && vertex1 != vertex2) {
+                matrix.get(vertex1 - 1).set(vertex2 - 1, true);
+                matrix.get(vertex2 - 1).set(vertex1 - 1, true);
                 edgeCount++;
-                vertexDegrees[vertex1 - 1]++;
-                vertexDegrees[vertex2 - 1]++;
+                //vertexDegrees[vertex1 - 1]++;
+                //vertexDegrees[vertex2 - 1]++;
             }
         } else {
             if (! array.get(vertex1 - 1).contains(vertex2) && vertex1 != vertex2) { // test if v1 and v2 are connected
                 array.get(vertex1 - 1).add(vertex2);
                 array.get(vertex2 - 1).add(vertex1);
                 edgeCount++;
-                vertexDegrees[vertex1 - 1]++;
-                vertexDegrees[vertex2 - 1]++;
+                //vertexDegrees[vertex1 - 1]++;
+                //vertexDegrees[vertex2 - 1]++;
             }
         }
     }
 
     public void BFS(Integer origin) {
         LinkedList<Node> searchTree = new LinkedList<Node>();
-        if (isMatrix) {
-            markedVertices = new boolean[vertexCount];
-            LinkedList<Node> queue = new LinkedList<Node>();
+        markedVertices = new boolean[vertexCount];
+        LinkedList<Node> queue = new LinkedList<Node>();
 
-            markedVertices[origin - 1] = true;
-            Node currentNode = new Node(origin, null);
-            searchTree.add(currentNode);
-            queue.add(currentNode);
-            
+        markedVertices[origin - 1] = true;
+        Node currentNode = new Node(origin, null);
+        searchTree.add(currentNode);
+        queue.add(currentNode);
+        
 
-            while (queue.size() != 0) {
-                currentNode = queue.poll();
-                System.out.println("current vertex = " + currentNode.name);
+        while (queue.size() != 0) {
+            currentNode = queue.poll();
+            // System.out.println("current vertex = " + currentNode.value);
+
+            if (isMatrix)  {
                 for (int i = 0; i < vertexCount; i++) {
-                    int n = matrix[currentNode.name - 1][i];
-                    if (n != 0 && !markedVertices[i]) {
+                    boolean n = matrix.get(currentNode.value - 1).get(i);
+                    if (n != false && !markedVertices[i]) {
                         markedVertices[i] = true;
                         Node newNode = new Node(i + 1, currentNode);
                         queue.add(newNode);
                         searchTree.add(newNode);
                     }
                 }
+            } else {
+                //Collections.sort(array.get(currentNode.value - 1));
+                for (Integer i : array.get(currentNode.value - 1)) {
+                     if (!markedVertices[i - 1]) {
+                        markedVertices[i - 1] = true;
+                        Node newNode = new Node(i, currentNode);
+                        queue.add(newNode);
+                        searchTree.add(newNode);
+                    }
+                }
             }
-        } else {
-            
+                
         }
-        WriteToBfsFile(searchTree);
+        WriteToTreeFile(searchTree, "BFS search tree.txt");
     }
-    private void WriteToBfsFile(LinkedList<Node> STree) {
+    private void WriteToTreeFile(LinkedList<Node> STree, String filename) {
         try {
-            FileWriter myWriter = new FileWriter("BFS search tree.txt");
+            FileWriter myWriter = new FileWriter(filename);
             for (Node node : STree) {
-                myWriter.write("Node: " + node.name);
-                if (node.parent != null) myWriter.write(" Parent: " + node.parent.name);
+                myWriter.write("Node: " + node.value);
+                if (node.parent != null) myWriter.write(" Parent: " + node.parent.value);
                 else myWriter.write(" Parent: " + node.parent);
                 myWriter.write(" Depth = " + node.depth + "\n");
             }
@@ -207,28 +228,52 @@ public class Test {
         }
     }
     public void DFS(Integer origin) {
+        LinkedList<Node> searchTree = new LinkedList<Node>();
         markedVertices = new boolean[vertexCount];
-        ActualDFS(origin, markedVertices);
-    }
-    private void ActualDFS(Integer origin, boolean[] visited) {
-        
-
         markedVertices[origin - 1] = true;
-        System.out.println(origin);
+        Node rootNode = new Node(origin, null);
+        searchTree.add(rootNode);
+        ActualDFS(rootNode, markedVertices, searchTree);
+        
+        WriteToTreeFile(searchTree, "DFS search tree.txt");
+    }
+    private void ActualDFS(Node parentNode, boolean[] visited, LinkedList<Node> STree) {
 
-        for (int i = 0; i < vertexCount; i++) {
-            int n = matrix[origin - 1][i];
-            if (n != 0 && !markedVertices[i]) {
-                ActualDFS(i + 1, visited);
+        Node currentNode = parentNode;
+        
+        System.out.println(currentNode.value); //lolol
+        if (isMatrix) {
+            for (int i = 0; i < vertexCount; i++) {
+                boolean n = matrix.get(currentNode.value - 1).get(i);
+                if (n != false && !markedVertices[i]) {
+                    markedVertices[i] = true;
+                    Node newNode = new Node(i + 1, currentNode);
+                    STree.add(newNode);
+                    ActualDFS(newNode, markedVertices, STree);
+                }
+            }
+        }else {
+            for (Integer i : array.get(currentNode.value - 1)) {
+                if (!markedVertices[i - 1]) {
+                    markedVertices[i - 1] = true;
+                    Node newNode = new Node(i, currentNode);
+                    STree.add(newNode);
+                    ActualDFS(newNode, markedVertices, STree);
+                }
+                        
             }
         }
+        
+    
     }
 
     public static void main(String[] args) {
-        Test myGraph = new Test(true);
-        myGraph.PrintMatrix(myGraph.matrix);
-        myGraph.BFS(1);
-        //myGraph.PrintArray(myGraph.array);
+        Test myTest = new Test(true);
+        //myTest.PrintMatrix(myTest.matrix);
+        
+        // myTest.PrintArray(myTest.array);
+        myTest.DFS(1); 
+        
     }
 
 

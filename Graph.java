@@ -13,7 +13,7 @@ import java.util.*;
 
 public class Graph {
     boolean isMatrix;
-    boolean[][] matrix;
+    ArrayList<ArrayList<Boolean>> matrix;
     ArrayList<ArrayList<Integer>> array;
     int vertexCount;
     int edgeCount;
@@ -38,8 +38,8 @@ public class Graph {
 
             vertexCount = Integer.valueOf(myReader.nextLine()); // Reads vertex count from input file
 
-            vertexDegrees = new Integer[vertexCount];
-            for (int i = 0; i < vertexCount; i++) vertexDegrees[i] = 0;
+            //vertexDegrees = new Integer[vertexCount];
+            //for (int i = 0; i < vertexCount; i++) vertexDegrees[i] = 0;
 
             if (isMatrix) {
                 matrix = CreateMatrix();
@@ -101,16 +101,22 @@ public class Graph {
         }
     }
 
-    private boolean[][] CreateMatrix() {
-        System.out.println("oi");
-        boolean[][] matrix = new boolean[vertexCount][vertexCount];
+    private ArrayList<ArrayList<Boolean>> CreateMatrix() {
+        ArrayList<ArrayList<Boolean>> matrix = new ArrayList<ArrayList<Boolean>>(vertexCount);
+        for (int i = 0; i < vertexCount; i++) {
+            ArrayList<Boolean> inner_array = new ArrayList<Boolean>(vertexCount);
+            /*for (Boolean element : inner_array) {
+                element = false;
+            }*/
+            matrix.add(inner_array);
+        }
         return matrix;
     }
 
     private ArrayList<ArrayList<Integer>> CreateArray() {
         ArrayList<ArrayList<Integer>> array = new ArrayList<ArrayList<Integer>> (vertexCount); // Create array and set it's size
         for (int i = 0; i < vertexCount; i++) {
-            ArrayList<Integer> inner_array = new ArrayList<Integer> ();
+            ArrayList<Integer> inner_array = new ArrayList<Integer>();
             array.add(inner_array);
         }
         return array;
@@ -144,9 +150,9 @@ public class Graph {
 
     private void AddEdge(int vertex1, int vertex2) {
         if (isMatrix) {
-            if (matrix[vertex1 - 1][vertex2 - 1] == false && vertex1 != vertex2) {
-                matrix[vertex1 - 1][vertex2 - 1] = true;
-                matrix[vertex2 - 1][vertex1 - 1] = true;
+            if (matrix.get(vertex1 - 1).get(vertex2 - 1) == false && vertex1 != vertex2) {
+                matrix.get(vertex1 - 1).set(vertex2 - 1, true);
+                matrix.get(vertex2 - 1).set(vertex1 - 1, true);
                 edgeCount++;
                 //vertexDegrees[vertex1 - 1]++;
                 //vertexDegrees[vertex2 - 1]++;
@@ -179,7 +185,7 @@ public class Graph {
 
             if (isMatrix)  {
                 for (int i = 0; i < vertexCount; i++) {
-                    boolean n = matrix[currentNode.value - 1][i];
+                    boolean n = matrix.get(currentNode.value - 1).get(i);
                     if (n != false && !markedVertices[i]) {
                         markedVertices[i] = true;
                         Node newNode = new Node(i + 1, currentNode);
@@ -228,7 +234,7 @@ public class Graph {
         System.out.println(origin);
 
         for (int i = 0; i < vertexCount; i++) {
-            boolean n = matrix[origin - 1][i];
+            boolean n = matrix.get(origin - 1).get(i);
             if (n != false && !markedVertices[i]) {
                 ActualDFS(i + 1, visited);
             }
@@ -236,7 +242,7 @@ public class Graph {
     }
 
     public static void main(String[] args) {
-        Graph myGraph = new Graph(false);
+        Graph myGraph = new Graph(true);
         //myGraph.PrintMatrix(myGraph.matrix);
         
         // myGraph.PrintArray(myGraph.array);

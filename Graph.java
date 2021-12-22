@@ -33,7 +33,7 @@ public class Graph {
 
     private void ReadInputFile() {
         try {
-            File myObj = new File("Input.txt");
+            File myObj = new File("grafo_1.txt");
             Scanner myReader = new Scanner(myObj);
 
             vertexCount = Integer.valueOf(myReader.nextLine()); // Reads vertex count from input file
@@ -282,15 +282,15 @@ public class Graph {
 
 
     public static void main(String[] args) {
-        Graph myGraph = new Graph(false);
+        Graph myGraph = new Graph(true);
         //myGraph.PrintMatrix(myGraph.matrix);
         
         // myGraph.PrintArray(myGraph.array);
-        myGraph.DFS(1);
+        //myGraph.DFS(1);
         myGraph.BFS(1);
 
-        System.out.println(myGraph.Distance(1, 5));
-        System.out.println(myGraph.Diameter());
+        //System.out.println(myGraph.Distance(1, 5));
+        //System.out.println(myGraph.Diameter());
     }
 
 

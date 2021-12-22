@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.io.FileWriter;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+//import java.util.List;
 import java.util.ArrayList;
-import java.io.*;
+//import java.io.*;
 import java.util.*;
-import java.util.stream.IntStream;
+//import java.util.stream.IntStream;
 
 public class Graph {
     boolean isMatrix;
@@ -33,7 +33,7 @@ public class Graph {
 
     private void ReadInputFile() {
         try {
-            File myObj = new File("Input.txt");
+            File myObj = new File("grafo_4.txt");
             Scanner myReader = new Scanner(myObj);
 
             vertexCount = Integer.valueOf(myReader.nextLine()); // Reads vertex count from input file

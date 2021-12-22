@@ -11,10 +11,10 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.IntStream;
 
-public class Graph {
+public class Test {
     boolean isMatrix;
     int[][] matrix;
-    ArrayList<ArrayList<Integer>> array;
+    Integer[][] vector;
     int vertexCount;
     int edgeCount;
     int minDegree;
@@ -24,7 +24,7 @@ public class Graph {
     Integer[] vertexDegrees;
     boolean[] markedVertices;
 
-    public Graph(boolean repChoice) {
+    public Test(boolean repChoice) {
         isMatrix = repChoice;
         ReadInputFile();
         CalculateAttributes();
@@ -44,8 +44,6 @@ public class Graph {
 
             if (isMatrix) {
                 matrix = CreateMatrix();
-            } else { 
-                array = CreateArray();
             }
 
             while (myReader.hasNextLine()) { // Reads and creates edges from input file
@@ -107,12 +105,6 @@ public class Graph {
         return matrix;
     }
 
-    private ArrayList<ArrayList> CreateArray() {
-        ArrayList<ArrayList<Integer>> array = new ArrayList<ArrayList<Integer>> (vertexCount); // Create array and set it's size
-        return array;
-    }
-
-
     private void PrintMatrix(int[][] matrix) {
         System.out.print("\u001B[41m" + "  ");
         for (int i = 0; i < matrix.length; i++) {
@@ -138,37 +130,35 @@ public class Graph {
                 vertexDegrees[vertex2 - 1]++;
             }
         } else {
-            if (! array.get(vertex1 - 1).contains(vertex2)) { // test if v1 and v2 are connected
-                array.get(vertex1 - 1).add(vertex2);
-                array.get(vertex2 - 1).add(vertex1);
-                edgeCount++;
-                vertexDegrees[vertex1 - 1]++;
-                vertexDegrees[vertex2 - 1]++;
-            }
+           // if (! vector[vertex1 - 1].stream(arr).AnyMatch(x -> x= vertex1)) { // If vertex2 is not connected yet
+                //vector[0] = vertex2 //
+            //}
         }
     }
 
     public void BFS(Integer currentVertex) {
 
         if (isMatrix) {
+            LinkedList<Node> searchTree = new LinkedList<Node>();
             markedVertices = new boolean[vertexCount];
             LinkedList<Integer> queue = new LinkedList<Integer>();
 
             markedVertices[currentVertex - 1] = true;
             queue.add(currentVertex);
-            int k = 0;
+            Node currentNode = new Node(currentVertex, null);
+            searchTree.add(currentNode);
             while (queue.size() != 0) {
                 currentVertex = queue.poll();
                 System.out.println("current vertex = " + currentVertex);
                 for (int i = 0; i < vertexCount; i++) {
                     int n = matrix[currentVertex - 1][i];
-                    System.out.println(n);
                     if (n != 0 && !markedVertices[i]) {
                         markedVertices[i] = true;
                         queue.add(i + 1);
+                        currentNode = new Node(i + 1, currentNode);
+                        searchTree.add(currentNode);
                     }
                 }
-                k++;
             }
         } else {
 
@@ -181,7 +171,7 @@ public class Graph {
     }
 
     public static void main(String[] args) {
-        Graph myGraph = new Graph(true);
+        Test myGraph = new Test(true);
         myGraph.BFS(1);
     }
 

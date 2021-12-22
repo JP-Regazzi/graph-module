@@ -164,13 +164,6 @@ public class Test {
         } else {
             
         }
-
-        for (Node node : searchTree) {
-            System.out.print("Node: " + node.name);
-            if (node.parent != null) System.out.print(" Parent: " + node.parent.name);
-            else System.out.print(" Parent: " + node.parent);
-            System.out.println(" Depth = " + node.depth);
-        }
         WriteToBfsFile(searchTree);
     }
     private void WriteToBfsFile(LinkedList<Node> STree) {
@@ -182,21 +175,33 @@ public class Test {
                 else myWriter.write(" Parent: " + node.parent);
                 myWriter.write(" Depth = " + node.depth + "\n");
             }
-
             myWriter.close();
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
     }
+    public void DFS(Integer origin) {
+        markedVertices = new boolean[vertexCount];
+        ActualDFS(origin, markedVertices);
+    }
+    private void ActualDFS(Integer origin, boolean[] visited) {
+        
 
-    public void DFS() {
-    
+        markedVertices[origin - 1] = true;
+        System.out.println(origin);
+
+        for (int i = 0; i < vertexCount; i++) {
+            int n = matrix[origin - 1][i];
+            if (n != 0 && !markedVertices[i]) {
+                ActualDFS(i + 1, visited);
+            }
+        }
     }
 
     public static void main(String[] args) {
         Test myGraph = new Test(true);
-        myGraph.BFS(1);
+        myGraph.DFS(1);
     }
 
 

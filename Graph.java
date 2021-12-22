@@ -28,7 +28,7 @@ public class Graph {
         isMatrix = repChoice;
         ReadInputFile();
         CalculateAttributes();
-        PrintMatrix(matrix);
+        //PrintMatrix(matrix);
         WriteToOutputFile();
     }
 
@@ -107,8 +107,12 @@ public class Graph {
         return matrix;
     }
 
-    private ArrayList<ArrayList> CreateArray() {
+    private ArrayList<ArrayList<Integer>> CreateArray() {
         ArrayList<ArrayList<Integer>> array = new ArrayList<ArrayList<Integer>> (vertexCount); // Create array and set it's size
+        for (int i = 0; i < vertexCount; i++) {
+            ArrayList<Integer> inner_array = new ArrayList<Integer> ();
+            array.add(inner_array);
+        }
         return array;
     }
 
@@ -128,9 +132,19 @@ public class Graph {
         }
     }
 
+    private void PrintArray(ArrayList<ArrayList<Integer>> array) {
+        for (int i = 0; i < array.size(); i++) {
+            System.out.print(i+1 + "-> ");
+            for (int j = 0; j < array.get(i).size(); j++) {
+                System.out.print(array.get(i).get(j) + " ");
+            }
+            System.out.print("\n");
+        }
+    }
+
     private void AddEdge(int vertex1, int vertex2) {
         if (isMatrix) {
-            if (matrix[vertex1 - 1][vertex2 - 1] == 0) {
+            if (matrix[vertex1 - 1][vertex2 - 1] == 0 && vertex1 != vertex2) {
                 matrix[vertex1 - 1][vertex2 - 1] = 1;
                 matrix[vertex2 - 1][vertex1 - 1] = 1;
                 edgeCount++;
@@ -138,7 +152,7 @@ public class Graph {
                 vertexDegrees[vertex2 - 1]++;
             }
         } else {
-            if (! array.get(vertex1 - 1).contains(vertex2)) { // test if v1 and v2 are connected
+            if (! array.get(vertex1 - 1).contains(vertex2) && vertex1 != vertex2) { // test if v1 and v2 are connected
                 array.get(vertex1 - 1).add(vertex2);
                 array.get(vertex2 - 1).add(vertex1);
                 edgeCount++;
@@ -181,8 +195,8 @@ public class Graph {
     }
 
     public static void main(String[] args) {
-        Graph myGraph = new Graph(true);
-        myGraph.BFS(1);
+        Graph myGraph = new Graph(false);
+        myGraph.PrintArray(myGraph.array);
     }
 
 

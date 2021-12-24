@@ -1,15 +1,12 @@
-import java.io.File;  // Import the File class
-import java.io.FileNotFoundException;  // Import this class to handle errors
-import java.util.Scanner; // Import the Scanner class to read text files
+import java.io.File; 
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 import java.io.IOException;
 import java.io.FileWriter;
 import java.util.Arrays;
 import java.util.Collections;
-//import java.util.List;
 import java.util.ArrayList;
-//import java.io.*;
 import java.util.*;
-//import java.util.stream.IntStream;
 
 public class Graph {
     boolean isMatrix;
@@ -31,9 +28,9 @@ public class Graph {
         WriteToOutputFile();
     }
 
-    private void ReadInputFile() {
+    private void CreateGraph() {
         try {
-            File myObj = new File("grafo_4.txt");
+            File myObj = new File("Input.txt");
             Scanner myReader = new Scanner(myObj);
 
             vertexCount = Integer.valueOf(myReader.nextLine()); // Reads vertex count from input file
@@ -51,7 +48,7 @@ public class Graph {
                 String edge [] = myReader.nextLine().split(" ");
                 AddEdge(Integer.valueOf(edge[0]), Integer.valueOf(edge[1]));
             }
-            //liberar espaco de memoria de vertexDegrees
+
             myReader.close();
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
@@ -62,12 +59,11 @@ public class Graph {
     private void CalculateAttributes() {
         minDegree = Collections.min(Arrays.asList(vertexDegrees));
         maxDegree = Collections.max(Arrays.asList(vertexDegrees));
-        //averageDegree = edgeCount*2/vertexCount;
         averageDegree = CalculateAverage();
         medianDegree = CalculateMedian();
     }
     private double CalculateAverage() {
-        double sum = 0; //average will have decimal point
+        double sum = 0;
 
         for(int i=0; i < vertexCount; i++) sum += Double.valueOf(vertexDegrees[i]);
 
@@ -214,7 +210,7 @@ public class Graph {
                     }
                 }
             } else {
-                //Collections.sort(array.get(currentNode.value - 1));
+                Collections.sort(array.get(currentNode.value - 1));
                 for (Integer i : array.get(currentNode.value - 1)) {
                      if (!markedVertices[i - 1]) {
                         markedVertices[i - 1] = true;
@@ -266,6 +262,7 @@ public class Graph {
                         }
                     }
                 } else {
+                    Collections.sort(array.get(currentNode.value - 1));
                     for (Integer neighbour : array.get(currentNode.value -1)) { // Itera por todos os vizinhos
                         Node newNode = new Node(neighbour, currentNode);
                         s.push(newNode);
@@ -357,12 +354,10 @@ public class Graph {
 
     public static void main(String[] args) {
         Graph myGraph = new Graph(false);
-        //myGraph.PrintMatrix(myGraph.matrix);
-        
+        // myGraph.PrintMatrix(myGraph.matrix);
         // myGraph.PrintArray(myGraph.array);
-        //myGraph.DFS(1);
+        myGraph.DFS(1);
         myGraph.BFS(1);
-        //myGraph.ConnectedComponents();
         //System.out.println(myGraph.Distance(1, 5));
         //System.out.println(myGraph.Diameter());
     }

@@ -23,7 +23,7 @@ public class Graph {
 
     public Graph(boolean repChoice) {
         isMatrix = repChoice;
-        ReadInputFile();
+        CreateGraph();
         CalculateAttributes();
         WriteToOutputFile();
     }
@@ -356,10 +356,11 @@ public class Graph {
         Graph myGraph = new Graph(false);
         // myGraph.PrintMatrix(myGraph.matrix);
         // myGraph.PrintArray(myGraph.array);
+        System.out.println(myGraph.Distance(1, 5));
+        System.out.println(myGraph.Diameter(false));
         myGraph.DFS(1);
         myGraph.BFS(1);
-        //System.out.println(myGraph.Distance(1, 5));
-        //System.out.println(myGraph.Diameter());
+        
     }
 
 

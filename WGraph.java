@@ -7,11 +7,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.*;
+import javafx.util.Pair;
 
 public class WGraph {
     boolean isMatrix;
     ArrayList<ArrayList<Boolean>> matrix;
-    ArrayList<ArrayList<Integer>> array;
+    ArrayList<ArrayList<Pair<Integer, Float>>> array;
     int vertexCount;
     int edgeCount;
     int minDegree;
@@ -20,6 +21,8 @@ public class WGraph {
     double medianDegree;
     Integer[] vertexDegrees;
     boolean[] markedVertices;
+
+    boolean hasNegativeWeight;
 
     public WGraph(boolean repChoice) {
         isMatrix = repChoice;
@@ -46,7 +49,7 @@ public class WGraph {
 
             while (myReader.hasNextLine()) { // Reads and creates edges from input file
                 String edge [] = myReader.nextLine().split(" ");
-                AddEdge(Integer.valueOf(edge[0]), Integer.valueOf(edge[1]));
+                AddEdge(Integer.valueOf(edge[0]), Integer.valueOf(edge[1]), Float.valueOf(edge[2]));
             }
 
             myReader.close();
@@ -130,10 +133,10 @@ public class WGraph {
         return matrix;
     }
 
-    private ArrayList<ArrayList<Integer>> CreateArray() {
-        ArrayList<ArrayList<Integer>> array = new ArrayList<ArrayList<Integer>> (vertexCount); // Create array and set it's size
+    private ArrayList<ArrayList<Pair<Integer, Float>>> CreateArray() { // Create array and set it's size
+        ArrayList<ArrayList<Pair<Integer, Float>>> array = new ArrayList<ArrayList<Pair<Integer, Float>>> (vertexCount);
         for (int i = 0; i < vertexCount; i++) {
-            ArrayList<Integer> inner_array = new ArrayList<Integer>();
+            ArrayList<Pair<Integer, Float>> inner_array = new ArrayList<Pair<Integer, Float>>();
             array.add(inner_array);
         }
         return array;
@@ -165,7 +168,13 @@ public class WGraph {
         }
     }
 
-    private void AddEdge(int vertex1, int vertex2) {
+    private void AddEdge(int vertex1, int vertex2, float weight) {
+        System.out.println(vertex1 + " " + vertex2 + " weight = " + weight);
+        if (!hasNegativeWeight && weight < 0) {
+            hasNegativeWeight = true; // Tests if the graph has negative weights
+            System.out.println("tem neg");
+        }
+
         if (isMatrix) {
             if (matrix.get(vertex1 - 1).get(vertex2 - 1) == false && vertex1 != vertex2) {
                 matrix.get(vertex1 - 1).set(vertex2 - 1, true);
@@ -175,9 +184,9 @@ public class WGraph {
                 vertexDegrees[vertex2 - 1]++;
             }
         } else {
-            if (! array.get(vertex1 - 1).contains(vertex2) && vertex1 != vertex2) { // Graph if v1 and v2 are connected
-                array.get(vertex1 - 1).add(vertex2);
-                array.get(vertex2 - 1).add(vertex1);
+            if (! array.get(vertex1 - 1).contains(vertex2) && vertex1 != vertex2) { // Tests if v1 and v2 are already connected
+                array.get(vertex1 - 1).add(new Pair<Integer, Float>(vertex2, weight));
+                array.get(vertex2 - 1).add(new Pair<Integer, Float>(vertex1, weight));
                 edgeCount++;
                 vertexDegrees[vertex1 - 1]++;
                 vertexDegrees[vertex2 - 1]++;
@@ -210,11 +219,11 @@ public class WGraph {
                     }
                 }
             } else {
-                Collections.sort(array.get(currentNode.value - 1));
-                for (Integer i : array.get(currentNode.value - 1)) {
-                     if (!markedVertices[i - 1]) {
-                        markedVertices[i - 1] = true;
-                        Node newNode = new Node(i, currentNode);
+                // Collections.sort(array.get(currentNode.value - 1)); RESOLVER DPS
+                for (Pair<Integer, Float> i : array.get(currentNode.value - 1)) {
+                     if (!markedVertices[i.getKey() - 1]) {
+                        markedVertices[i.getKey() - 1] = true;
+                        Node newNode = new Node(i.getKey(), currentNode);
                         queue.add(newNode);
                         searchTree.add(newNode);
                     }
@@ -262,9 +271,9 @@ public class WGraph {
                         }
                     }
                 } else {
-                    Collections.sort(array.get(currentNode.value - 1));
-                    for (Integer neighbour : array.get(currentNode.value -1)) { // Itera por todos os vizinhos
-                        Node newNode = new Node(neighbour, currentNode);
+                    // Collections.sort(array.get(currentNode.value - 1));
+                    for (Pair<Integer, Float> neighbour : array.get(currentNode.value -1)) { // Itera por todos os vizinhos
+                        Node newNode = new Node(neighbour.getKey(), currentNode);
                         s.push(newNode);
                     }
                 }
@@ -353,11 +362,12 @@ public class WGraph {
 
 
     public static void main(String[] args) {
-        Graph myGraph = new Graph(false);
+        WGraph myGraph = new WGraph(false);
         // myGraph.PrintMatrix(myGraph.matrix);
         // myGraph.PrintArray(myGraph.array);
         System.out.println(myGraph.Distance(1, 5));
         System.out.println(myGraph.Diameter(false));
+        
         myGraph.DFS(1);
         myGraph.BFS(1);
         

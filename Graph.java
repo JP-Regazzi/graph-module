@@ -175,7 +175,7 @@ public class Graph {
                 vertexDegrees[vertex2 - 1]++;
             }
         } else {
-            if (! array.get(vertex1 - 1).contains(vertex2) && vertex1 != vertex2) { // Graph if v1 and v2 are connected
+            if (! array.get(vertex1 - 1).contains(vertex2) && vertex1 != vertex2) { // Tests if v1 and v2 are already connected
                 array.get(vertex1 - 1).add(vertex2);
                 array.get(vertex2 - 1).add(vertex1);
                 edgeCount++;

@@ -356,6 +356,51 @@ public class WGraph {
         return components;
     }
 
+    public void WeightedDistance(int s) {
+        if (hasNegativeWeight) {
+
+        } else {
+            Dijkstra(s);
+        }
+    }
+
+    private void Dijkstra(int s) {
+        Boolean explored[] = new Boolean[vertexCount]; // Array containing info on what vertices were explored
+        float dist[] = new float[vertexCount]; // Array containing the current distance estimate of each vertex
+
+        for (int i = 0; i < vertexCount; i++) { // Sets all vertices as not explored and all the distances to infinite
+            explored[i] = false;
+            dist[i] = Float.MAX_VALUE;
+        }
+        dist[s] = 0; // Distance from source to itself is set to 0
+
+        for (int i = 0; i < vertexCount - 1; i++) { // Goes through all vertices in the graph, exploring them
+            int u = minDistance(dist, explored); // Chooses the not yet explored vertex with minimum distance
+
+            explored[u] = true;
+
+            for (Pair<Integer, Float> edge : array.get(u - 1)) {
+                if (!explored[edge.getKey()] && dist[u] != Float.MAX_VALUE && dist[u] + edge.getValue() < dist[edge.getKey()]) {
+                    dist[edge.getKey()] = dist[u] + edge.getValue();
+                }
+            }
+
+        }
+    }
+
+    private int minDistance(float dist[], Boolean explored[]) {
+        // Initialize min value
+        float min = Float.MAX_VALUE;
+        int min_index = -1;
+ 
+        for (int v = 0; v < vertexCount; v++)
+            if (explored[v] == false && dist[v] <= min) {
+                min = dist[v];
+                min_index = v;
+            }
+ 
+        return min_index;
+    }
     
 
 

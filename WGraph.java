@@ -356,15 +356,24 @@ public class WGraph {
         return components;
     }
 
-    public void WeightedDistance(int s) {
+    public void Distance2(int s, int target) {
         if (hasNegativeWeight) {
 
         } else {
-            Dijkstra(s);
+            Dijkstra(s, target);
         }
     }
 
-    private void Dijkstra(int s) {
+    public void DistanceAll(int s) {
+        if (hasNegativeWeight) {
+
+        } else {
+            Dijkstra(s, -1);
+        }
+    }
+
+    private void Dijkstra(int s, int target) {
+        int[] parents = new int[vertexCount]; // Array containing the parent of each node
         s--;
         Boolean explored[] = new Boolean[vertexCount]; // Array that represents what vertices were explored
         float dist[] = new float[vertexCount]; // Array containing the current distance estimate of each vertex
@@ -374,24 +383,57 @@ public class WGraph {
             dist[i] = Float.MAX_VALUE;
         }
         dist[s] = 0; // Distance from source to itself is set to 0
+        parents[s] = -1;
 
         for (int i = 0; i < vertexCount; i++) { // Goes through all vertices in the graph
-            System.out.println(i);
             int u = minDistance(dist, explored); // Chooses the not yet explored vertex with minimum distance
+            System.out.println(u);
 
             explored[u] = true;
 
             for (Pair<Integer, Float> edge : array.get(u)) {
                 if (!explored[edge.getKey()-1] && dist[u] != Float.MAX_VALUE && dist[u] + edge.getValue() < dist[edge.getKey()-1]) {
                     dist[edge.getKey()-1] = dist[u] + edge.getValue();
+                    parents[edge.getKey()-1] = u;
                 }
             }
 
         }
+        // Debug
         System.out.println("distances: ");
         for (float i : dist) {
             System.out.println(i);
         }
+        System.out.println("Parents: ");
+        for (int i : parents) {
+            System.out.println(i);
+        }
+        System.out.println("Path: ");
+        for (Integer i : GetPath(4, parents)) {
+            System.out.println(i);
+        }
+        //
+        if (target != -1) {
+            System.out.println("Distance between vertices " + target + " and " + (s+1) + " = " + dist[target-1]);
+            System.out.print("Path:");
+            for (Integer node : GetPath(target-1, parents)) {
+                System.out.print(" > "+ (node+1));
+            }
+            System.out.print("\n\n");
+        } else {
+            System.out.println("Distances between vertex " + (s+1) + " and all vertices, along with their paths:\n");
+            for (int index = 0; index < vertexCount; index++) {
+                System.out.println("Distance to vertex " + (index+1) + " = " + dist[index]);
+                System.out.print("Path to vertex " + (index+1) + ": ");
+                for (Integer node : GetPath(index, parents)) {
+                    System.out.print(" > "+ (node+1));
+                }
+                System.out.print("\n\n");
+            }
+        }
+        
+
+
         
     }
 
@@ -408,6 +450,18 @@ public class WGraph {
  
         return min_index;
     }
+
+    private LinkedList<Integer> GetPath(int target, int[] parents) {
+        int currentParent = parents[target];
+        LinkedList<Integer> path = new LinkedList<Integer>();
+        path.add(target);
+        while (currentParent != -1) {
+            path.add(currentParent);
+            //System.out.println(currentParent);
+            currentParent = parents[currentParent];
+        }
+        return path;
+    }
     
 
 
@@ -421,7 +475,8 @@ public class WGraph {
         //System.out.println(myGraph.Diameter(false));
         //myGraph.DFS(1);
         //myGraph.BFS(1);
-        myGraph.WeightedDistance(1);
+        myGraph.Distance2(1, 5);
+        myGraph.DistanceAll(1);
         
     }
 

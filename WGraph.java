@@ -365,7 +365,8 @@ public class WGraph {
     }
 
     private void Dijkstra(int s) {
-        Boolean explored[] = new Boolean[vertexCount]; // Array containing info on what vertices were explored
+        s--;
+        Boolean explored[] = new Boolean[vertexCount]; // Array that represents what vertices were explored
         float dist[] = new float[vertexCount]; // Array containing the current distance estimate of each vertex
 
         for (int i = 0; i < vertexCount; i++) { // Sets all vertices as not explored and all the distances to infinite
@@ -374,18 +375,24 @@ public class WGraph {
         }
         dist[s] = 0; // Distance from source to itself is set to 0
 
-        for (int i = 0; i < vertexCount - 1; i++) { // Goes through all vertices in the graph, exploring them
+        for (int i = 0; i < vertexCount; i++) { // Goes through all vertices in the graph
+            System.out.println(i);
             int u = minDistance(dist, explored); // Chooses the not yet explored vertex with minimum distance
 
             explored[u] = true;
 
-            for (Pair<Integer, Float> edge : array.get(u - 1)) {
-                if (!explored[edge.getKey()] && dist[u] != Float.MAX_VALUE && dist[u] + edge.getValue() < dist[edge.getKey()]) {
-                    dist[edge.getKey()] = dist[u] + edge.getValue();
+            for (Pair<Integer, Float> edge : array.get(u)) {
+                if (!explored[edge.getKey()-1] && dist[u] != Float.MAX_VALUE && dist[u] + edge.getValue() < dist[edge.getKey()-1]) {
+                    dist[edge.getKey()-1] = dist[u] + edge.getValue();
                 }
             }
 
         }
+        System.out.println("distances: ");
+        for (float i : dist) {
+            System.out.println(i);
+        }
+        
     }
 
     private int minDistance(float dist[], Boolean explored[]) {
@@ -410,11 +417,11 @@ public class WGraph {
         WGraph myGraph = new WGraph(false);
         // myGraph.PrintMatrix(myGraph.matrix);
         // myGraph.PrintArray(myGraph.array);
-        System.out.println(myGraph.Distance(1, 5));
-        System.out.println(myGraph.Diameter(false));
-        
-        myGraph.DFS(1);
-        myGraph.BFS(1);
+        //System.out.println(myGraph.WeightedDistance(1));
+        //System.out.println(myGraph.Diameter(false));
+        //myGraph.DFS(1);
+        //myGraph.BFS(1);
+        myGraph.WeightedDistance(1);
         
     }
 

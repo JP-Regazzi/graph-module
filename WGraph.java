@@ -414,14 +414,14 @@ public class WGraph {
         }
         //
         if (target != -1) {
-            System.out.println("Distance between vertices " + target + " and " + (s+1) + " = " + dist[target-1]);
+            System.out.println("\nDistance between vertices " + target + " and " + (s+1) + " = " + dist[target-1]);
             System.out.print("Path:");
             for (Integer node : GetPath(target-1, parents)) {
                 System.out.print(" > "+ (node+1));
             }
             System.out.print("\n\n");
         } else {
-            System.out.println("Distances between vertex " + (s+1) + " and all vertices, along with their paths:\n");
+            System.out.println("\nDistances between vertex " + (s+1) + " and all vertices, along with their paths:\n");
             for (int index = 0; index < vertexCount; index++) {
                 System.out.println("Distance to vertex " + (index+1) + " = " + dist[index]);
                 System.out.print("Path to vertex " + (index+1) + ": ");

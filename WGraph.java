@@ -1,3 +1,4 @@
+import java.io.Console;
 import java.io.File; 
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -7,7 +8,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.*;
-import javafx.util.Pair;
+// import javafx.util.Pair;
+
+import java.lang.Math;
 
 public class WGraph {
     boolean isMatrix;
@@ -358,7 +361,7 @@ public class WGraph {
 
     public void Distance2(int s, int target) {
         if (hasNegativeWeight) {
-
+            BellmanFord(s);
         } else {
             Dijkstra(s, target);
         }
@@ -366,7 +369,7 @@ public class WGraph {
 
     public void DistanceAll(int s) {
         if (hasNegativeWeight) {
-
+            BellmanFord(s);
         } else {
             Dijkstra(s, -1);
         }
@@ -437,6 +440,46 @@ public class WGraph {
         
     }
 
+    private float [] BellmanFord(int target) {
+        System.out.println("BellmanFord started running!");
+
+        float dist[] = new float[vertexCount]; // Array containing the current distance estimate of each vertex (M no slide)
+
+        for (int i = 0; i < vertexCount; i++) { // Sets all the distances to infinite
+            dist[i] = Float.MAX_VALUE;
+        }
+        dist[target-1] = 0; // Set distance from target to itself to 0
+
+        // Iterate through all possible number of edges that OPT can use to find the minimun path between target and v 
+        for (int i = 1; i < vertexCount; i++) {  //  1 <= i <= n-1
+            // Iterate through all vertices                                               
+            for (int v = 1; v <= vertexCount; v++) {  // 1 <= v <= n (OBS THERE IS NO V0, but the position 0 in dist is for V1)
+                // Iterate through all edges of v (All pairs are inside of an array in the position v, inside the outer array)
+                for (Pair<Integer, Float> edge : array.get(v-1)) {
+                    if (dist[edge.getKey() - 1] + edge.getValue() < dist[v-1]) { // if dist[neighbour] + c_wv < dist[v]]
+                        dist[v-1] = dist[edge.getKey() - 1] + edge.getValue();
+                        // System.out.println("New value: " + dist[v-1]);
+                    }
+                }
+            }
+        }
+        for (int v=1; v <= vertexCount; v++) {
+            for (Pair<Integer, Float> edge : array.get(v-1)) {
+                if (dist[edge.getKey() - 1] + edge.getValue() < dist[v-1]) { // if dist[neighbour] + c_wv < dist[v]]
+                    System.out.println("Grafo possui ciclo negativo");
+                    // return algo
+                } 
+            }
+        }
+        // Debug
+        for (int i = 0; i < dist.length; i++) {
+            int temp = i+1;
+            System.out.println("Distance of vertex " + temp + " to vertex " + target + " is: "+ dist[i]);
+        }
+        System.out.println("BellmanFord algorithm is finised!");
+        return dist;
+    }
+
     private int minDistance(float dist[], Boolean explored[]) {
         // Initialize min value
         float min = Float.MAX_VALUE;
@@ -475,8 +518,10 @@ public class WGraph {
         //System.out.println(myGraph.Diameter(false));
         //myGraph.DFS(1);
         //myGraph.BFS(1);
-        myGraph.Distance2(1, 5);
+        // myGraph.Distance2(1, 5);
         myGraph.DistanceAll(1);
+
+        //myGraph.BellmanFord(2);
         
     }
 

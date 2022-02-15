@@ -36,7 +36,7 @@ public class WGraph {
 
     private void CreateGraph() {
         try {
-            File myObj = new File("grafo_W_3_1.txt");
+            File myObj = new File("grafo_W_2_1.txt");
             Scanner myReader = new Scanner(myObj);
 
             vertexCount = Integer.valueOf(myReader.nextLine()); // Reads vertex count from input file
@@ -516,8 +516,8 @@ public class WGraph {
         return path;
     }
 
-    public void MST() {
-
+    public void PrimMST() {
+        float totalWeight = 0;
         int parents[] = new int[vertexCount];
         float key[] = new float[vertexCount];
         Boolean explored[] = new Boolean[vertexCount];
@@ -530,21 +530,24 @@ public class WGraph {
         parents[0] = -1;
 
         for (int i = 0; i < vertexCount-1; i++) {
+            if (i%1000 == 0) System.out.println("(" + i + "/" + vertexCount + "), " + ((float)i/(float)vertexCount)*100 + "%");
             int u = MinDistance(key, explored);
             explored[u] = true;
 
             for (Pair<Integer, Float> edge : array.get(u)) {
                 if (!explored[edge.getKey()-1] && edge.getValue() < key[edge.getKey()-1]) {
+
                     parents[edge.getKey()-1] = u;
                     key[edge.getKey()-1] = edge.getValue();
                 }
             }
         }
-        /*
-        for (int index = 0; index < parents.length; index++) {
-            System.out.println("Node: " + (index + 1) + ", Parent: " + (parents[index]+1));
+        for (int index = 0; index < key.length; index++) {
+            totalWeight += Aprox(key[index]);
         }
-        */
+
+        System.out.println("Total weight = " + totalWeight);
+        
         try {
             FileWriter myWriter = new FileWriter("mst.txt");
             for (int index = 0; index < parents.length; index++) {  
@@ -558,6 +561,10 @@ public class WGraph {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+    }
+
+    private float Aprox(float input) { // Aproximates float values to 2 decimal places
+        return Math.round(input * 100.0f) / 100.0f;
     }
 
 
@@ -574,12 +581,12 @@ public class WGraph {
         //System.out.println(myGraph.Diameter(false));
         //myGraph.DFS(1);
         //myGraph.BFS(1);
-        myGraph.DistanceAll(1);
+        //myGraph.DistanceAll(1);
         //myGraph.MST();
 
         //myGraph.BellmanFord(2);
 
-        myGraph.MST();
+        myGraph.PrimMST();
         
     }
 

@@ -145,6 +145,81 @@ public class WGraph {
         return array;
     }
 
+    public LinkedList<Node> BFS(Integer origin) {
+        LinkedList<Node> searchTree = new LinkedList<Node>();
+        markedVertices = new boolean[vertexCount];
+        LinkedList<Node> queue = new LinkedList<Node>();
+
+        markedVertices[origin - 1] = true;
+        Node currentNode = new Node(origin, null);
+        searchTree.add(currentNode);
+        queue.add(currentNode);
+
+
+        while (queue.size() != 0) {
+            currentNode = queue.poll();
+
+            if (isMatrix)  {
+                for (int i = 0; i < vertexCount; i++) {
+                    boolean n = matrix.get(currentNode.value - 1).get(i);
+                    if (n != false && !markedVertices[i]) {
+                        markedVertices[i] = true;
+                        Node newNode = new Node(i + 1, currentNode);
+                        queue.add(newNode);
+                        searchTree.add(newNode);
+                    }
+                }
+            } else {
+                // Collections.sort(array.get(currentNode.value - 1)); RESOLVER DPS
+                for (Pair<Integer, Float> i : array.get(currentNode.value - 1)) {
+                     if (!markedVertices[i.getKey() - 1]) {
+                        markedVertices[i.getKey() - 1] = true;
+                        Node newNode = new Node(i.getKey(), currentNode);
+                        queue.add(newNode);
+                        searchTree.add(newNode);
+                    }
+                }
+            }
+
+        }
+        WriteToTreeFile(searchTree, "BFS search tree.txt");
+        return searchTree;
+    }
+
+    public ArrayList<ArrayList<Integer>> ConnectedComponents() {
+        ArrayList<ArrayList<Integer>> components = new ArrayList<ArrayList<Integer>>();
+        boolean[] markedNodes = new boolean[vertexCount];
+        boolean isDone = false;
+        int s = 1;
+        while (!isDone) {
+            ArrayList<Integer> currentComponent = new ArrayList<Integer>();
+            components.add(currentComponent);
+            
+            BFS(s);
+            for (int i = 0; i < markedNodes.length; i++) {
+                if (markedVertices[i]) {
+                    markedNodes[i] = true;
+                    currentComponent.add(i + 1);
+                }
+            }
+
+            isDone = true;
+            for (int i = 0; i < markedNodes.length; i++) {
+                if (!markedNodes[i]) {
+                    isDone = false;
+                    s = i + 1;
+                }
+            }
+
+        }
+
+        Collections.sort(components, new Comparator<ArrayList>(){
+            public int compare(ArrayList a1, ArrayList a2) {
+                return a2.size() - a1.size();
+            }
+        });
+        return components;
+    }
 
     private void PrintMatrix(boolean[][] matrix) {
         System.out.print("\u001B[41m" + "  ");
@@ -197,46 +272,6 @@ public class WGraph {
         }
     }
 
-    public LinkedList<Node> BFS(Integer origin) {
-        LinkedList<Node> searchTree = new LinkedList<Node>();
-        markedVertices = new boolean[vertexCount];
-        LinkedList<Node> queue = new LinkedList<Node>();
-
-        markedVertices[origin - 1] = true;
-        Node currentNode = new Node(origin, null);
-        searchTree.add(currentNode);
-        queue.add(currentNode);
-        
-
-        while (queue.size() != 0) {
-            currentNode = queue.poll();
-
-            if (isMatrix)  {
-                for (int i = 0; i < vertexCount; i++) {
-                    boolean n = matrix.get(currentNode.value - 1).get(i);
-                    if (n != false && !markedVertices[i]) {
-                        markedVertices[i] = true;
-                        Node newNode = new Node(i + 1, currentNode);
-                        queue.add(newNode);
-                        searchTree.add(newNode);
-                    }
-                }
-            } else {
-                // Collections.sort(array.get(currentNode.value - 1)); RESOLVER DPS
-                for (Pair<Integer, Float> i : array.get(currentNode.value - 1)) {
-                     if (!markedVertices[i.getKey() - 1]) {
-                        markedVertices[i.getKey() - 1] = true;
-                        Node newNode = new Node(i.getKey(), currentNode);
-                        queue.add(newNode);
-                        searchTree.add(newNode);
-                    }
-                }
-            }
-                
-        }
-        WriteToTreeFile(searchTree, "BFS search tree.txt");
-        return searchTree;
-    }
     private void WriteToTreeFile(LinkedList<Node> STree, String filename) {
         try {
             FileWriter myWriter = new FileWriter(filename);
@@ -252,116 +287,12 @@ public class WGraph {
             e.printStackTrace();
         }
     }
-    public LinkedList<Node> DFS(Integer origin) {
-        LinkedList<Node> searchTree = new LinkedList<Node>();
-        markedVertices = new boolean[vertexCount]; // Desmarco todos os vertices
-        Stack<Node> s = new Stack<Node>(); // Crio a pilha
-        Node rootNode = new Node(origin, null); // Crio a raiz da arvore
-        s.push(rootNode); // Coloco a raiz na pilha
 
-        while (! s.empty()) {
-
-            Node currentNode = s.pop();
-            if (!markedVertices[currentNode.value - 1]) {
-                markedVertices[currentNode.value - 1] = true;
-                searchTree.add(currentNode);
-                if (isMatrix){
-                    for (int i = 0; i < vertexCount; i++) {
-                        boolean n = matrix.get(currentNode.value - 1).get(i);
-                        if (n == true && !markedVertices[i]) {
-                            Node newNode = new Node(i + 1, currentNode);
-                            s.push(newNode);
-                        }
-                    }
-                } else {
-                    // Collections.sort(array.get(currentNode.value - 1));
-                    for (Pair<Integer, Float> neighbour : array.get(currentNode.value -1)) { // Itera por todos os vizinhos
-                        Node newNode = new Node(neighbour.getKey(), currentNode);
-                        s.push(newNode);
-                    }
-                }
-            }
-        }
-        WriteToTreeFile(searchTree, "DFS search tree.txt");
-        return searchTree;
-    }
-
-    public int Distance(int vertex1, int vertex2) {
-        LinkedList<Node> tree = BFS(vertex1);
-        for (Node vertex : tree) {
-            if (vertex.value == vertex2) {
-                return vertex.depth;
-            }
-        }
-        return -1;
-    }
-
-    public int Diameter(boolean aprox) {
-        int maxDist = 0;
-        if (aprox) {
-            int k = (int)(Math.log(vertexCount)/Math.log(2));
-            Random r = new Random();
-            for (int i = 0; i < k; i++) {
-                int num = r.nextInt(vertexCount - 1) + 1;
-                LinkedList<Node> tree = BFS(num);
-                int dist = 0;
-                for (Node vertex : tree) {
-                    if (vertex.depth > dist) dist = vertex.depth;
-                }
-                if (dist > maxDist) maxDist = dist;
-            }
-
-        } else {
-            for (int i = 1; i < vertexCount + 1; i++) {
-                LinkedList<Node> tree = BFS(i);
-                int dist = 0;
-                for (Node vertex : tree) {
-                    if (vertex.depth > dist) dist = vertex.depth;
-                }
-                if (dist > maxDist) maxDist = dist;
-            }
-        }
-        return maxDist;
-    }
-
-    public ArrayList<ArrayList<Integer>> ConnectedComponents() {
-        ArrayList<ArrayList<Integer>> components = new ArrayList<ArrayList<Integer>>();
-        boolean[] markedNodes = new boolean[vertexCount];
-        boolean isDone = false;
-        int s = 1;
-        while (!isDone) {
-            ArrayList<Integer> currentComponent = new ArrayList<Integer>();
-            components.add(currentComponent);
-            
-            BFS(s);
-            for (int i = 0; i < markedNodes.length; i++) {
-                if (markedVertices[i]) {
-                    markedNodes[i] = true;
-                    currentComponent.add(i + 1);
-                }
-            }
-
-            isDone = true;
-            for (int i = 0; i < markedNodes.length; i++) {
-                if (!markedNodes[i]) {
-                    isDone = false;
-                    s = i + 1;
-                }
-            }
-
-        }
-
-        Collections.sort(components, new Comparator<ArrayList>(){
-            public int compare(ArrayList a1, ArrayList a2) {
-                return a2.size() - a1.size();
-            }
-        });
-        return components;
-    }
-
+    
     public void Distance2(int s, int target) {
         if (hasNegativeWeight) {
-            BellmanFord(s);
+            BellmanFord(s, target);
+
         } else {
             Dijkstra(s, target);
         }
@@ -369,7 +300,7 @@ public class WGraph {
 
     public void DistanceAll(int s) {
         if (hasNegativeWeight) {
-            BellmanFord(s);
+            BellmanFord(s, -1);
         } else {
             Dijkstra(s, -1);
         }
@@ -377,7 +308,6 @@ public class WGraph {
 
     private void Dijkstra(int s, int target) {
         int[] parents = new int[vertexCount]; // Array containing the parent of each node
-        s--;
         Boolean explored[] = new Boolean[vertexCount]; // Array that represents what vertices were explored
         float dist[] = new float[vertexCount]; // Array containing the current distance estimate of each vertex
 
@@ -385,8 +315,8 @@ public class WGraph {
             explored[i] = false;
             dist[i] = Float.MAX_VALUE;
         }
-        dist[s] = 0; // Distance from source to itself is set to 0
-        parents[s] = -1;
+        dist[s-1] = 0; // Distance from source to itself is set to 0
+        parents[s-1] = -1;
 
         for (int i = 0; i < vertexCount; i++) { // Goes through all vertices in the graph
             int u = minDistance(dist, explored); // Chooses the not yet explored vertex with minimum distance
@@ -397,12 +327,12 @@ public class WGraph {
             for (Pair<Integer, Float> edge : array.get(u)) {
                 if (!explored[edge.getKey()-1] && dist[u] != Float.MAX_VALUE && dist[u] + edge.getValue() < dist[edge.getKey()-1]) {
                     dist[edge.getKey()-1] = dist[u] + edge.getValue();
-                    parents[edge.getKey()-1] = u;
+                    parents[edge.getKey()-1] = u + 1;
                 }
             }
 
         }
-        // Debug
+        /*
         System.out.println("distances: ");
         for (float i : dist) {
             System.out.println(i);
@@ -414,22 +344,21 @@ public class WGraph {
         System.out.println("Path: ");
         for (Integer i : GetPath(4, parents)) {
             System.out.println(i);
-        }
-        //
+        }*/
         if (target != -1) {
-            System.out.println("\nDistance between vertices " + target + " and " + (s+1) + " = " + dist[target-1]);
+            System.out.println("\nDistance between vertices " + target + " and " + (s) + " = " + dist[target-1]);
             System.out.print("Path:");
-            for (Integer node : GetPath(target-1, parents)) {
-                System.out.print(" > "+ (node+1));
+            for (Integer node : GetPathDijkstra(target-1, parents)) {
+                System.out.print(" > "+ (node));
             }
             System.out.print("\n\n");
         } else {
-            System.out.println("\nDistances between vertex " + (s+1) + " and all vertices, along with their paths:\n");
-            for (int index = 0; index < vertexCount; index++) {
-                System.out.println("Distance to vertex " + (index+1) + " = " + dist[index]);
-                System.out.print("Path to vertex " + (index+1) + ": ");
-                for (Integer node : GetPath(index, parents)) {
-                    System.out.print(" > "+ (node+1));
+            System.out.println("\nDistances between vertex " + (s) + " and all vertices, along with their paths:\n");
+            for (int vertex = 1; vertex <= vertexCount; vertex++) {
+                System.out.println("Distance to vertex " + (vertex) + " = " + dist[vertex-1]);
+                System.out.print("Path to vertex " + (vertex) + ": ");
+                for (Integer node : GetPathDijkstra(vertex, parents)) {
+                    System.out.print(" > "+ (node));
                 }
                 System.out.print("\n\n");
             }
@@ -440,43 +369,87 @@ public class WGraph {
         
     }
 
-    private float [] BellmanFord(int target) {
+    private float [] BellmanFord(int target, int start) {
         System.out.println("BellmanFord started running!");
 
         float dist[] = new float[vertexCount]; // Array containing the current distance estimate of each vertex (M no slide)
-
         for (int i = 0; i < vertexCount; i++) { // Sets all the distances to infinite
             dist[i] = Float.MAX_VALUE;
         }
         dist[target-1] = 0; // Set distance from target to itself to 0
 
-        // Iterate through all possible number of edges that OPT can use to find the minimun path between target and v 
+        int[] parents = new int[vertexCount];
+        parents[target-1] = -1;
+
+        // Creating an array with all paths
+        ArrayList<ArrayList<Integer>> path = new ArrayList<ArrayList<Integer>>(vertexCount);
+        for (int i = 0; i < vertexCount; i++) {
+            ArrayList<Integer> inner_array = new ArrayList<Integer>();
+            path.add(inner_array);
+        }
+        path.get(target-1).add(target);
+
+        // Iterate through all possible number of edges that OPT can use to find the minimum path between target and v 
         for (int i = 1; i < vertexCount; i++) {  //  1 <= i <= n-1
             // Iterate through all vertices                                               
             for (int v = 1; v <= vertexCount; v++) {  // 1 <= v <= n (OBS THERE IS NO V0, but the position 0 in dist is for V1)
                 // Iterate through all edges of v (All pairs are inside of an array in the position v, inside the outer array)
                 for (Pair<Integer, Float> edge : array.get(v-1)) {
-                    if (dist[edge.getKey() - 1] + edge.getValue() < dist[v-1]) { // if dist[neighbour] + c_wv < dist[v]]
+                    if (dist[edge.getKey() - 1] + edge.getValue() < dist[v-1]) { // if dist[neighbor] + c_wv < dist[v]]
                         dist[v-1] = dist[edge.getKey() - 1] + edge.getValue();
-                        // System.out.println("New value: " + dist[v-1]);
+                        path.set(v-1, path.get(edge.getKey()-1));
+                        path.get(v-1).add(v);
+                        //System.out.println(path.get(v-1) + " e " + v);
+                        parents[v-1] = edge.getKey();
+                        //System.out.println("New Parent of "+ v + " is " + edge.getKey());
+                        //System.out.println("New value: " + dist[v-1]);
                     }
                 }
             }
         }
+        
         for (int v=1; v <= vertexCount; v++) {
             for (Pair<Integer, Float> edge : array.get(v-1)) {
                 if (dist[edge.getKey() - 1] + edge.getValue() < dist[v-1]) { // if dist[neighbour] + c_wv < dist[v]]
-                    System.out.println("Grafo possui ciclo negativo");
-                    // return algo
-                } 
+                    //if (parents[edge.getKey()-1] != v-1) {
+                    System.out.println("Unknown distance due to negative cycle.");
+                    return null;
+                    //}
+                    
+                }
             }
         }
         // Debug
+        if (start != -1) {
+            System.out.println("\nDistance between vertices " + start + " and " + target + " = " + dist[start-1]);
+            System.out.print("Path:");
+            for (int index = 0; index < path.size(); index++) {
+                System.out.println(path.get(index));
+                
+            }
+            /*
+            for (Integer node : path.get(start-1)) {
+                System.out.print(" > "+ (node));
+            }*/
+            System.out.print("\n\n");
+        } else {
+            System.out.println("\nDistances between vertex " + (target) + " and all vertices, along with their paths:\n");
+            for (int vertex = 1; vertex <= vertexCount; vertex++) {
+                System.out.println("Distance to vertex " + (vertex) + " = " + dist[vertex-1]);
+                System.out.print("Path to vertex " + (vertex) + ": ");
+                for (Integer node : GetPathDijkstra(vertex, parents)) {
+                    System.out.print(" > "+ (node));
+                }
+                System.out.print("\n\n");
+            }
+        }
+        
+        /*
         for (int i = 0; i < dist.length; i++) {
             int temp = i+1;
             System.out.println("Distance of vertex " + temp + " to vertex " + target + " is: "+ dist[i]);
-        }
-        System.out.println("BellmanFord algorithm is finised!");
+        }*/
+        System.out.println("BellmanFord algorithm is finished!");
         return dist;
     }
 
@@ -494,17 +467,51 @@ public class WGraph {
         return min_index;
     }
 
-    private LinkedList<Integer> GetPath(int target, int[] parents) {
-        int currentParent = parents[target];
+    private LinkedList<Integer> GetPathDijkstra(int vertex, int[] parents) {
+        //for (int i = 0; i < parents.length; i++) {
+        //    System.out.println(parents[i]);
+        //}
+        int currentParent = parents[vertex-1];
         LinkedList<Integer> path = new LinkedList<Integer>();
-        path.add(target);
+        path.add(vertex);
         while (currentParent != -1) {
             path.add(currentParent);
-            //System.out.println(currentParent);
-            currentParent = parents[currentParent];
+            currentParent = parents[currentParent-1];
         }
         return path;
     }
+
+    public void MST() {
+
+        int parents[] = new int[vertexCount];
+        float key[] = new float[vertexCount];
+        Boolean explored[] = new Boolean[vertexCount];
+
+        for (int i = 0; i < vertexCount; i++) {
+            key[i] = Integer.MAX_VALUE;
+            explored[i] = false;
+        }
+        key[0] = 0;
+        parents[0] = -1;
+
+        for (int i = 0; i < vertexCount-1; i++) {
+            int u = minDistance(key, explored);
+            explored[u] = true;
+
+            for (Pair<Integer, Float> edge : array.get(u)) {
+                if (!explored[edge.getKey()-1] && edge.getValue() < key[edge.getKey()-1]) {
+                    parents[edge.getKey()-1] = u;
+                    key[edge.getKey()-1] = edge.getValue();
+                }
+            }
+        }
+
+        for (int index = 0; index < parents.length; index++) {
+            System.out.println("Node: " + (index + 1) + ", Parent: " + (parents[index]+1));
+        }
+    }
+
+
     
 
 
@@ -519,7 +526,7 @@ public class WGraph {
         //myGraph.DFS(1);
         //myGraph.BFS(1);
         // myGraph.Distance2(1, 5);
-        myGraph.DistanceAll(1);
+        myGraph.MST();
 
         //myGraph.BellmanFord(2);
         

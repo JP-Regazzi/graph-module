@@ -389,25 +389,42 @@ public class WGraph {
         }
         path.get(target-1).add(target);
 
+
         // Iterate through all possible number of edges that OPT can use to find the minimum path between target and v 
         for (int i = 1; i < vertexCount; i++) {  //  1 <= i <= n-1
             // Iterate through all vertices                                               
             for (int v = 1; v <= vertexCount; v++) {  // 1 <= v <= n (OBS THERE IS NO V0, but the position 0 in dist is for V1)
                 // Iterate through all edges of v (All pairs are inside of an array in the position v, inside the outer array)
                 for (Pair<Integer, Float> edge : array.get(v-1)) {
-                    if (dist[edge.getKey() - 1] + edge.getValue() < dist[v-1]) { // if dist[neighbor] + c_wv < dist[v]]
+                    if (dist[edge.getKey() - 1] + edge.getValue() < dist[v-1] && v != target  && parents[edge.getKey()-1] != v) {
+                        
+                        // Update dist
                         dist[v-1] = dist[edge.getKey() - 1] + edge.getValue();
-                        path.set(v-1, path.get(edge.getKey()-1));
+
+                        // Update path of target to v
+                        ArrayList<Integer> temp = new ArrayList<Integer>(path.get(edge.getKey()-1));
+                        path.set(v-1, temp);
+
+                        // Test if there is a negative cycle (in the middle of the path update)
+                        if (temp.contains(v)) {
+                            System.out.print("VERTEX: "+ v + ", PATH: " + temp + " i: " + i);
+                            System.out.println("\nUnknown distance due to negative cycle.");
+                            return null;
+                        }
+
+                        // Finishes updating path of target to v
                         path.get(v-1).add(v);
-                        //System.out.println(path.get(v-1) + " e " + v);
+                        
+                        // Update parent
                         parents[v-1] = edge.getKey();
-                        //System.out.println("New Parent of "+ v + " is " + edge.getKey());
-                        //System.out.println("New value: " + dist[v-1]);
+
+                        System.out.println(Arrays.toString(path.toArray()) + " after, v = " + v + ", i = " + i);
                     }
                 }
             }
         }
         
+        /*
         for (int v=1; v <= vertexCount; v++) {
             for (Pair<Integer, Float> edge : array.get(v-1)) {
                 if (dist[edge.getKey() - 1] + edge.getValue() < dist[v-1]) { // if dist[neighbour] + c_wv < dist[v]]
@@ -418,7 +435,7 @@ public class WGraph {
                     
                 }
             }
-        }
+        }*/
         // Debug
         if (start != -1) {
             System.out.println("\nDistance between vertices " + start + " and " + target + " = " + dist[start-1]);
@@ -437,7 +454,7 @@ public class WGraph {
             for (int vertex = 1; vertex <= vertexCount; vertex++) {
                 System.out.println("Distance to vertex " + (vertex) + " = " + dist[vertex-1]);
                 System.out.print("Path to vertex " + (vertex) + ": ");
-                for (Integer node : GetPathDijkstra(vertex, parents)) {
+                for (Integer node : path.get(vertex-1) ) {
                     System.out.print(" > "+ (node));
                 }
                 System.out.print("\n\n");
@@ -529,6 +546,8 @@ public class WGraph {
         myGraph.MST();
 
         //myGraph.BellmanFord(2);
+
+        myGraph.DistanceAll(1);
         
     }
 

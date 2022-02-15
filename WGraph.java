@@ -526,6 +526,20 @@ public class WGraph {
         for (int index = 0; index < parents.length; index++) {
             System.out.println("Node: " + (index + 1) + ", Parent: " + (parents[index]+1));
         }
+
+        try {
+            FileWriter myWriter = new FileWriter("mst.txt");
+            for (int index = 0; index < parents.length; index++) {  
+                if (parents[index] != -1) {
+                    myWriter.write((index+1) + " ");
+                    myWriter.write((parents[index]+1) + "\n");
+                }
+            }
+            myWriter.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
 
@@ -543,11 +557,11 @@ public class WGraph {
         //myGraph.DFS(1);
         //myGraph.BFS(1);
         // myGraph.Distance2(1, 5);
-        myGraph.MST();
+        //myGraph.MST();
 
         //myGraph.BellmanFord(2);
 
-        myGraph.DistanceAll(1);
+        myGraph.MST();
         
     }
 

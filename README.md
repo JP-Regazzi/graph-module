@@ -6,8 +6,8 @@ A biblioteca é capaz de executar uma série de algoritmos sobre a matriz, atrav
 
 # Fazer
 
-1- Testar o BellanFord para todos os casos (com input's pequenos) </p>
-2- Terminar a funcao MST </p>
+1- Testar o BellanFord para todos os casos (com input's pequenos) X</p>
+2- Terminar a funcao MST X</p>
 3- Melhorar o algoritmo do Dijkstra </p>
 4- Testar com os grafos do site (pra ver se funciona mesmo as paradas) </p>
 5- Fazer as coisas que pedem no pdf sobre input e output. (acho q podemos receber um grafo com pesos ou sem pesos) </p>

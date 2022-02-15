@@ -36,7 +36,7 @@ public class WGraph {
 
     private void CreateGraph() {
         try {
-            File myObj = new File("Input.txt");
+            File myObj = new File("grafo_W_3_1.txt");
             Scanner myReader = new Scanner(myObj);
 
             vertexCount = Integer.valueOf(myReader.nextLine()); // Reads vertex count from input file
@@ -247,7 +247,7 @@ public class WGraph {
     }
 
     private void AddEdge(int vertex1, int vertex2, float weight) {
-        System.out.println(vertex1 + " " + vertex2 + " weight = " + weight);
+        //System.out.println(vertex1 + " " + vertex2 + " weight = " + weight);
         if (!hasNegativeWeight && weight < 0) {
             hasNegativeWeight = true; // Tests if the graph has negative weights
             System.out.println("tem neg");
@@ -318,12 +318,12 @@ public class WGraph {
         dist[s-1] = 0; // Distance from source to itself is set to 0
         parents[s-1] = -1;
 
-        PriorityQueue<Pair<Integer, Float>> queue = new PriorityQueue<>((v1, v2) -> Math.round(1000*v1.getValue()) - Math.round(1000*v2.getValue()));
+        PriorityQueue<Pair<Integer, Float>> queue = new PriorityQueue<>((v1, v2) -> Math.round(10000*v1.getValue()) - Math.round(10000*v2.getValue()));
         queue.add(new Pair<Integer, Float>(s, 0f));
 
         while (queue.size() > 0) {
             int u = queue.poll().getKey()-1;
-            System.out.println(u);
+            //System.out.println(u);
 
             explored[u] = true;
             for (Pair<Integer, Float> edge : array.get(u)) {
@@ -366,7 +366,7 @@ public class WGraph {
         if (target != -1) {
             System.out.println("\nDistance between vertices " + target + " and " + (s) + " = " + dist[target-1]);
             System.out.print("Path:");
-            for (Integer node : GetPathDijkstra(target-1, parents)) {
+            for (Integer node : GetPathDijkstra(target, parents)) {
                 System.out.print(" > "+ (node));
             }
             System.out.print("\n\n");
@@ -540,11 +540,11 @@ public class WGraph {
                 }
             }
         }
-
+        /*
         for (int index = 0; index < parents.length; index++) {
             System.out.println("Node: " + (index + 1) + ", Parent: " + (parents[index]+1));
         }
-
+        */
         try {
             FileWriter myWriter = new FileWriter("mst.txt");
             for (int index = 0; index < parents.length; index++) {  

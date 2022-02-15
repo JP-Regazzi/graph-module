@@ -318,8 +318,26 @@ public class WGraph {
         dist[s-1] = 0; // Distance from source to itself is set to 0
         parents[s-1] = -1;
 
-        for (int i = 0; i < vertexCount; i++) { // Goes through all vertices in the graph
-            int u = minDistance(dist, explored); // Chooses the not yet explored vertex with minimum distance
+        PriorityQueue<Pair<Integer, Float>> queue = new PriorityQueue<>((v1, v2) -> Math.round(1000*v1.getValue()) - Math.round(1000*v2.getValue()));
+        queue.add(new Pair<Integer, Float>(s, 0f));
+
+        while (queue.size() > 0) {
+            int u = queue.poll().getKey()-1;
+            System.out.println(u);
+
+            explored[u] = true;
+            for (Pair<Integer, Float> edge : array.get(u)) {
+                if (!explored[edge.getKey()-1] && dist[u] != Float.MAX_VALUE && dist[u] + edge.getValue() < dist[edge.getKey()-1]) {
+                    dist[edge.getKey()-1] = dist[u] + edge.getValue();
+                    parents[edge.getKey()-1] = u + 1;
+                    queue.add(new Pair<Integer, Float>(edge.getKey(), dist[edge.getKey()-1]));
+                }
+            }
+        }
+
+
+        /*for (int i = 0; i < vertexCount; i++) { // Goes through all vertices in the graph
+            int u = MinDistance(dist, explored); // Chooses the not yet explored vertex with minimum distance
             System.out.println(u);
 
             explored[u] = true;
@@ -331,7 +349,7 @@ public class WGraph {
                 }
             }
 
-        }
+        }*/
         /*
         System.out.println("distances: ");
         for (float i : dist) {
@@ -470,7 +488,7 @@ public class WGraph {
         return dist;
     }
 
-    private int minDistance(float dist[], Boolean explored[]) {
+    private int MinDistance(float dist[], Boolean explored[]) {
         // Initialize min value
         float min = Float.MAX_VALUE;
         int min_index = -1;
@@ -512,7 +530,7 @@ public class WGraph {
         parents[0] = -1;
 
         for (int i = 0; i < vertexCount-1; i++) {
-            int u = minDistance(key, explored);
+            int u = MinDistance(key, explored);
             explored[u] = true;
 
             for (Pair<Integer, Float> edge : array.get(u)) {
@@ -556,7 +574,7 @@ public class WGraph {
         //System.out.println(myGraph.Diameter(false));
         //myGraph.DFS(1);
         //myGraph.BFS(1);
-        // myGraph.Distance2(1, 5);
+        myGraph.DistanceAll(1);
         //myGraph.MST();
 
         //myGraph.BellmanFord(2);

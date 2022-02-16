@@ -30,13 +30,13 @@ public class WGraph {
     public WGraph(boolean repChoice) {
         isMatrix = repChoice;
         CreateGraph();
-        CalculateAttributes();
-        WriteToOutputFile();
+        //CalculateAttributes();
+        //WriteToOutputFile();
     }
 
     private void CreateGraph() {
         try {
-            File myObj = new File("grafo_W_2_1.txt");
+            File myObj = new File("grafo_W_5_1.txt");
             Scanner myReader = new Scanner(myObj);
 
             vertexCount = Integer.valueOf(myReader.nextLine()); // Reads vertex count from input file
@@ -85,7 +85,7 @@ public class WGraph {
     }
 
 
-
+    /*
     public void WriteToOutputFile() {
         try {
             ArrayList<ArrayList<Integer>> components = ConnectedComponents();
@@ -122,7 +122,7 @@ public class WGraph {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
-    }
+    }*/
 
     private ArrayList<ArrayList<Boolean>> CreateMatrix() {
         ArrayList<ArrayList<Boolean>> matrix = new ArrayList<ArrayList<Boolean>>(vertexCount);
@@ -328,7 +328,7 @@ public class WGraph {
             explored[u] = true;
             for (Pair<Integer, Float> edge : array.get(u)) {
                 if (!explored[edge.getKey()-1] && dist[u] != Float.MAX_VALUE && dist[u] + edge.getValue() < dist[edge.getKey()-1]) {
-                    dist[edge.getKey()-1] = dist[u] + edge.getValue();
+                    dist[edge.getKey()-1] = Aprox(dist[u] + edge.getValue());
                     parents[edge.getKey()-1] = u + 1;
                     queue.add(new Pair<Integer, Float>(edge.getKey(), dist[edge.getKey()-1]));
                 }
@@ -373,12 +373,14 @@ public class WGraph {
         } else {
             System.out.println("\nDistances between vertex " + (s) + " and all vertices, along with their paths:\n");
             for (int vertex = 1; vertex <= vertexCount; vertex++) {
+                //if (vertex == 10 || vertex == 20 || vertex == 30 || vertex == 40 || vertex == 50){
                 System.out.println("Distance to vertex " + (vertex) + " = " + dist[vertex-1]);
                 System.out.print("Path to vertex " + (vertex) + ": ");
                 for (Integer node : GetPathDijkstra(vertex, parents)) {
                     System.out.print(" > "+ (node));
                 }
                 System.out.print("\n\n");
+                //}
             }
         }
         
@@ -546,7 +548,7 @@ public class WGraph {
             totalWeight += Aprox(key[index]);
         }
 
-        System.out.println("Total weight = " + totalWeight);
+        System.out.println("Total weight = " + Aprox(totalWeight));
         
         try {
             FileWriter myWriter = new FileWriter("mst.txt");
@@ -575,18 +577,8 @@ public class WGraph {
 
     public static void main(String[] args) {
         WGraph myGraph = new WGraph(false);
-        // myGraph.PrintMatrix(myGraph.matrix);
-        // myGraph.PrintArray(myGraph.array);
-        //System.out.println(myGraph.WeightedDistance(1));
-        //System.out.println(myGraph.Diameter(false));
-        //myGraph.DFS(1);
-        //myGraph.BFS(1);
-        //myGraph.DistanceAll(1);
-        //myGraph.MST();
-
-        //myGraph.BellmanFord(2);
-
-        myGraph.PrimMST();
+        myGraph.DistanceAll(1);
+        //myGraph.PrimMST();
         
     }
 

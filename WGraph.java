@@ -4,48 +4,28 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.io.IOException;
 import java.io.FileWriter;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.ArrayList;
 import java.util.*;
 import java.util.Random;
-// import javafx.util.Pair;
-
 import java.lang.Math;
 
 public class WGraph {
-    ArrayList<ArrayList<Boolean>> matrix;
     ArrayList<ArrayList<Pair<Integer, Float>>> array;
     int vertexCount;
-    int edgeCount;
-    int minDegree;
-    int maxDegree;
-    double averageDegree;
-    double medianDegree;
-    Integer[] vertexDegrees;
-    boolean[] markedVertices;
-
     boolean hasNegativeWeight;
 
     public WGraph() {
-        //isMatrix = repChoice;
         CreateGraph();
-        //CalculateAttributes();
-        //WriteToOutputFile();
     }
 
     private void CreateGraph() {
         try {
-            File myObj = new File("grafo_W_4_1.txt");
+            File myObj = new File("Input.txt");
             Scanner myReader = new Scanner(myObj);
 
             vertexCount = Integer.valueOf(myReader.nextLine()); // Reads vertex count from input file
 
-            vertexDegrees = new Integer[vertexCount];
-            for (int i = 0; i < vertexCount; i++) vertexDegrees[i] = 0;
-
             array = CreateArray();
-
 
             while (myReader.hasNextLine()) { // Reads and creates edges from input file
                 String edge [] = myReader.nextLine().split(" ");
@@ -59,79 +39,6 @@ public class WGraph {
         }
     }
 
-    private void CalculateAttributes() {
-        minDegree = Collections.min(Arrays.asList(vertexDegrees));
-        maxDegree = Collections.max(Arrays.asList(vertexDegrees));
-        averageDegree = CalculateAverage();
-        medianDegree = CalculateMedian();
-    }
-    private double CalculateAverage() {
-        double sum = 0;
-
-        for(int i=0; i < vertexCount; i++) sum += Double.valueOf(vertexDegrees[i]);
-
-        return sum/vertexCount;
-    
-    }
-    private double CalculateMedian() {
-        Integer[] numArray = new Integer[vertexCount];
-        for (int index = 0; index < vertexDegrees.length; index++) numArray[index] = vertexDegrees[index];
-        Arrays.sort(numArray);
-        if (numArray.length % 2 == 0) return ((double)numArray[numArray.length/2] + (double)numArray[numArray.length/2 - 1])/2;
-        else return (double) numArray[numArray.length/2];
-    }
-
-
-    /*
-    public void WriteToOutputFile() {
-        try {
-            ArrayList<ArrayList<Integer>> components = ConnectedComponents();
-            FileWriter myWriter = new FileWriter("Output.txt");
-            myWriter.write("Number of vertices: " + vertexCount + "\n");
-            myWriter.write("Number of edges: " + edgeCount + "\n");
-            myWriter.write("Minimum degree: " + minDegree + "\n");
-            myWriter.write("Maximum degree: " + maxDegree + "\n");
-            myWriter.write("Average degree: " + averageDegree + "\n");
-            myWriter.write("Median degree: " + medianDegree + "\n");
-            myWriter.write("Number of connected components: " + components.size() + "\n");
-            myWriter.write("Connected components: " + "\n");
-
-
-            myWriter.write(1 + "st component, size: " + components.get(0).size() + ", vertices:\n");
-            myWriter.write("[" + components.get(0).get(0));
-            for (int j = 1; j < components.get(0).size(); j++) {
-                myWriter.write(", " + components.get(0).get(j));
-            }
-            myWriter.write("]\n");
-            
-            for (int i = 1; i < components.size(); i++) {
-                ArrayList<Integer> tree = components.get(i);
-                myWriter.write(i + 1 + "th component, size: " + tree.size() + ", vertices:\n");
-                myWriter.write("[" + tree.get(0));
-                for (int j = 1; j < tree.size(); j++) {
-                    myWriter.write(", " + tree.get(j));
-                }
-                myWriter.write("]\n");
-            }
-
-            myWriter.close();
-        } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
-    }*/
-
-    private ArrayList<ArrayList<Boolean>> CreateMatrix() {
-        ArrayList<ArrayList<Boolean>> matrix = new ArrayList<ArrayList<Boolean>>(vertexCount);
-        for (int i = 0; i < vertexCount; i++) {
-            ArrayList<Boolean> inner_array = new ArrayList<Boolean>(vertexCount);
-            for (int j = 0; j < vertexCount; j++) {
-                inner_array.add(false);
-            }
-            matrix.add(inner_array);
-        }
-        return matrix;
-    }
 
     private ArrayList<ArrayList<Pair<Integer, Float>>> CreateArray() { // Create array and set it's size
         ArrayList<ArrayList<Pair<Integer, Float>>> array = new ArrayList<ArrayList<Pair<Integer, Float>>> (vertexCount);
@@ -142,130 +49,21 @@ public class WGraph {
         return array;
     }
 
-    public LinkedList<Node> BFS(Integer origin) {
-        LinkedList<Node> searchTree = new LinkedList<Node>();
-        markedVertices = new boolean[vertexCount];
-        LinkedList<Node> queue = new LinkedList<Node>();
-
-        markedVertices[origin - 1] = true;
-        Node currentNode = new Node(origin, null);
-        searchTree.add(currentNode);
-        queue.add(currentNode);
-
-
-        while (queue.size() != 0) {
-            currentNode = queue.poll();
-
-
-            // Collections.sort(array.get(currentNode.value - 1)); RESOLVER DPS
-            for (Pair<Integer, Float> i : array.get(currentNode.value - 1)) {
-                if (!markedVertices[i.getKey() - 1]) {
-                    markedVertices[i.getKey() - 1] = true;
-                    Node newNode = new Node(i.getKey(), currentNode);
-                    queue.add(newNode);
-                    searchTree.add(newNode);
-                }
-            }
-
-        }
-        WriteToTreeFile(searchTree, "BFS search tree.txt");
-        return searchTree;
-    }
-
-    public ArrayList<ArrayList<Integer>> ConnectedComponents() {
-        ArrayList<ArrayList<Integer>> components = new ArrayList<ArrayList<Integer>>();
-        boolean[] markedNodes = new boolean[vertexCount];
-        boolean isDone = false;
-        int s = 1;
-        while (!isDone) {
-            ArrayList<Integer> currentComponent = new ArrayList<Integer>();
-            components.add(currentComponent);
-            
-            BFS(s);
-            for (int i = 0; i < markedNodes.length; i++) {
-                if (markedVertices[i]) {
-                    markedNodes[i] = true;
-                    currentComponent.add(i + 1);
-                }
-            }
-
-            isDone = true;
-            for (int i = 0; i < markedNodes.length; i++) {
-                if (!markedNodes[i]) {
-                    isDone = false;
-                    s = i + 1;
-                }
-            }
-
-        }
-
-        Collections.sort(components, new Comparator<ArrayList>(){
-            public int compare(ArrayList a1, ArrayList a2) {
-                return a2.size() - a1.size();
-            }
-        });
-        return components;
-    }
-
-    private void PrintMatrix(boolean[][] matrix) {
-        System.out.print("\u001B[41m" + "  ");
-        for (int i = 0; i < matrix.length; i++) {
-            System.out.print(i + 1  + " ");
-        }
-        System.out.print("\u001B[0m" + "\n");
-        for (int i = 0; i < matrix.length; i++) {
-            System.out.print("\u001B[41m" + (i + 1) + " " + "\u001B[0m");
-            for (int j = 0; j < matrix[0].length; j++) {
-                System.out.print(matrix[i][j] + " ");
-            }
-            System.out.print("\n");
-        }
-    }
-
-    private void PrintArray(ArrayList<ArrayList<Integer>> array) {
-        for (int i = 0; i < array.size(); i++) {
-            System.out.print(i+1 + "-> ");
-            for (int j = 0; j < array.get(i).size(); j++) {
-                System.out.print(array.get(i).get(j) + " ");
-            }
-            System.out.print("\n");
-        }
-    }
 
     private void AddEdge(int vertex1, int vertex2, float weight) {
         //System.out.println(vertex1 + " " + vertex2 + " weight = " + weight);
         if (!hasNegativeWeight && weight < 0) {
             hasNegativeWeight = true; // Tests if the graph has negative weights
-            System.out.println("tem neg");
         }
 
         if (! array.get(vertex1 - 1).contains(vertex2) && vertex1 != vertex2) { // Tests if v1 and v2 are already connected
             array.get(vertex1 - 1).add(new Pair<Integer, Float>(vertex2, weight));
             array.get(vertex2 - 1).add(new Pair<Integer, Float>(vertex1, weight));
-            edgeCount++;
-            vertexDegrees[vertex1 - 1]++;
-            vertexDegrees[vertex2 - 1]++;
-        }
-    }
-
-    private void WriteToTreeFile(LinkedList<Node> STree, String filename) {
-        try {
-            FileWriter myWriter = new FileWriter(filename);
-            for (Node node : STree) {
-                myWriter.write("Node: " + node.value);
-                if (node.parent != null) myWriter.write(" Parent: " + node.parent.value);
-                else myWriter.write(" Parent: " + node.parent);
-                myWriter.write(" Depth = " + node.depth + "\n");
-            }
-            myWriter.close();
-        } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
         }
     }
 
     
-    public void Distance2(int s, int target) {
+    public void Distance(int s, int target) {
         if (hasNegativeWeight) {
             BellmanFord(s, target);
 
@@ -274,6 +72,7 @@ public class WGraph {
         }
     }
 
+
     public void DistanceAll(int s) {
         if (hasNegativeWeight) {
             BellmanFord(s, -1);
@@ -281,6 +80,7 @@ public class WGraph {
             Dijkstra(s, -1);
         }
     }
+
 
     private void Dijkstra(int s, int target) {
         int[] parents = new int[vertexCount]; // Array containing the parent of each node
@@ -296,13 +96,9 @@ public class WGraph {
 
         PriorityQueue<Pair<Integer, Float>> queue = new PriorityQueue<>((v1, v2) -> Math.round(10000*v1.getValue()) - Math.round(10000*v2.getValue()));
         queue.add(new Pair<Integer, Float>(s, 0f));
-        //int i = 0;
+
         while (queue.size() > 0) {
-            //i++;
-            //if (i%10000 == 0)
-            //System.out.println(queue.size());
             int u = queue.poll().getKey()-1;
-            //System.out.println(u);
 
             explored[u] = true;
             for (Pair<Integer, Float> edge : array.get(u)) {
@@ -314,34 +110,6 @@ public class WGraph {
             }
         }
 
-
-        /*for (int i = 0; i < vertexCount; i++) { // Goes through all vertices in the graph
-            int u = MinDistance(dist, explored); // Chooses the not yet explored vertex with minimum distance
-            System.out.println(u);
-
-            explored[u] = true;
-
-            for (Pair<Integer, Float> edge : array.get(u)) {
-                if (!explored[edge.getKey()-1] && dist[u] != Float.MAX_VALUE && dist[u] + edge.getValue() < dist[edge.getKey()-1]) {
-                    dist[edge.getKey()-1] = dist[u] + edge.getValue();
-                    parents[edge.getKey()-1] = u + 1;
-                }
-            }
-
-        }*/
-        /*
-        System.out.println("distances: ");
-        for (float i : dist) {
-            System.out.println(i);
-        }
-        System.out.println("Parents: ");
-        for (int i : parents) {
-            System.out.println(i);
-        }
-        System.out.println("Path: ");
-        for (Integer i : GetPath(4, parents)) {
-            System.out.println(i);
-        }*/
         if (target != -1) {
             System.out.println("\nDistance between vertices " + target + " and " + (s) + " = " + dist[target-1]);
             System.out.print("Path:");
@@ -350,24 +118,17 @@ public class WGraph {
             }
             System.out.print("\n\n");
         } else {
-            /*
+            
             System.out.println("\nDistances between vertex " + (s) + " and all vertices, along with their paths:\n");
             for (int vertex = 1; vertex <= vertexCount; vertex++) {
-                if (vertex == 717737 || vertex == 471365 || vertex == 5709 || vertex == 11386 || vertex == 343930){
                 System.out.println("Distance to vertex " + (vertex) + " = " + dist[vertex-1]);
                 System.out.print("Path to vertex " + (vertex) + ": ");
                 for (Integer node : GetPathDijkstra(vertex, parents)) {
                     System.out.print(" > "+ (node));
                 }
                 System.out.print("\n\n");
-                }
-            }
-            */
+            }  
         }
-        
-
-
-        
     }
 
     private void LowCostDijkstra(int s, int target) {
@@ -395,19 +156,7 @@ public class WGraph {
             }
 
         }
-        /*
-        System.out.println("distances: ");
-        for (float i : dist) {
-            System.out.println(i);
-        }
-        System.out.println("Parents: ");
-        for (int i : parents) {
-            System.out.println(i);
-        }
-        System.out.println("Path: ");
-        for (Integer i : GetPath(4, parents)) {
-            System.out.println(i);
-        }*/
+
         if (target != -1) {
             System.out.println("\nDistance between vertices " + target + " and " + (s) + " = " + dist[target-1]);
             System.out.print("Path:");
@@ -418,20 +167,14 @@ public class WGraph {
         } else {
             System.out.println("\nDistances between vertex " + (s) + " and all vertices, along with their paths:\n");
             for (int vertex = 1; vertex <= vertexCount; vertex++) {
-                //if (vertex == 10 || vertex == 20 || vertex == 30 || vertex == 40 || vertex == 50){
                 System.out.println("Distance to vertex " + (vertex) + " = " + dist[vertex-1]);
                 System.out.print("Path to vertex " + (vertex) + ": ");
                 for (Integer node : GetPathDijkstra(vertex, parents)) {
                     System.out.print(" > "+ (node));
                 }
                 System.out.print("\n\n");
-                //}
             }
-        }
-        
-
-
-        
+        }   
     }
 
     private float [] BellmanFord(int target, int start) {
@@ -472,7 +215,7 @@ public class WGraph {
 
                         // Test if there is a negative cycle (in the middle of the path update)
                         if (temp.contains(v)) {
-                            System.out.print("VERTEX: "+ v + ", PATH: " + temp + " i: " + i);
+                            //System.out.print("VERTEX: "+ v + ", PATH: " + temp + " i: " + i);
                             System.out.println("\nUnknown distance due to negative cycle.");
                             return null;
                         }
@@ -482,55 +225,30 @@ public class WGraph {
                         
                         // Update parent
                         parents[v-1] = edge.getKey();
-
-                        //System.out.println(Arrays.toString(path.toArray()) + " after, v = " + v + ", i = " + i);
                     }
                 }
             }
         }
-        
-        /*
-        for (int v=1; v <= vertexCount; v++) {
-            for (Pair<Integer, Float> edge : array.get(v-1)) {
-                if (dist[edge.getKey() - 1] + edge.getValue() < dist[v-1]) { // if dist[neighbour] + c_wv < dist[v]]
-                    //if (parents[edge.getKey()-1] != v-1) {
-                    System.out.println("Unknown distance due to negative cycle.");
-                    return null;
-                    //}
-                    
-                }
-            }
-        }*/
         // Debug
         if (start != -1) {
             System.out.println("\nDistance between vertices " + start + " and " + target + " = " + dist[start-1]);
             System.out.print("Path:");
-            for (int index = 0; index < path.size(); index++) {
-                System.out.println(path.get(index));
-                
-            }
-            /*
+            
             for (Integer node : path.get(start-1)) {
                 System.out.print(" > "+ (node));
-            }*/
+            }
             System.out.print("\n\n");
         } else {
             System.out.println("\nDistances between vertex " + (target) + " and all vertices, along with their paths:\n");
-            /*for (int vertex = 1; vertex <= vertexCount; vertex++) {
+            for (int vertex = 1; vertex <= vertexCount; vertex++) {
                 System.out.println("Distance to vertex " + (vertex) + " = " + dist[vertex-1]);
                 System.out.print("Path to vertex " + (vertex) + ": ");
                 for (Integer node : path.get(vertex-1) ) {
                     System.out.print(" > "+ (node));
                 }
                 System.out.print("\n\n");
-            }*/
+            }
         }
-        
-        /*
-        for (int i = 0; i < dist.length; i++) {
-            int temp = i+1;
-            System.out.println("Distance of vertex " + temp + " to vertex " + target + " is: "+ dist[i]);
-        }*/
         System.out.println("BellmanFord algorithm is finished!");
         return dist;
     }
@@ -624,7 +342,8 @@ public class WGraph {
         WGraph myGraph = new WGraph();
         //myGraph.DistanceAll(2722);
         //myGraph.PrimMST();
-        
+        myGraph.BellmanFord(1, 5);
+        /*
         Random gerador = new Random();
         long[] timeTaken = new long[100];
         long totalTime = 0;
@@ -639,7 +358,7 @@ public class WGraph {
         }
         System.out.println(totalTime);
         System.out.println(myGraph.hasNegativeWeight);
-        
+        */
     }
 
 

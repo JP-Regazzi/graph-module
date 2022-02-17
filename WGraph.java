@@ -8,12 +8,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.*;
+import java.util.Random;
 // import javafx.util.Pair;
 
 import java.lang.Math;
 
 public class WGraph {
-    boolean isMatrix;
     ArrayList<ArrayList<Boolean>> matrix;
     ArrayList<ArrayList<Pair<Integer, Float>>> array;
     int vertexCount;
@@ -27,8 +27,8 @@ public class WGraph {
 
     boolean hasNegativeWeight;
 
-    public WGraph(boolean repChoice) {
-        isMatrix = repChoice;
+    public WGraph() {
+        //isMatrix = repChoice;
         CreateGraph();
         //CalculateAttributes();
         //WriteToOutputFile();
@@ -36,7 +36,7 @@ public class WGraph {
 
     private void CreateGraph() {
         try {
-            File myObj = new File("grafo_W_5_1.txt");
+            File myObj = new File("grafo_W_4_1.txt");
             Scanner myReader = new Scanner(myObj);
 
             vertexCount = Integer.valueOf(myReader.nextLine()); // Reads vertex count from input file
@@ -44,11 +44,8 @@ public class WGraph {
             vertexDegrees = new Integer[vertexCount];
             for (int i = 0; i < vertexCount; i++) vertexDegrees[i] = 0;
 
-            if (isMatrix) {
-                matrix = CreateMatrix();
-            } else { 
-                array = CreateArray();
-            }
+            array = CreateArray();
+
 
             while (myReader.hasNextLine()) { // Reads and creates edges from input file
                 String edge [] = myReader.nextLine().split(" ");
@@ -159,25 +156,14 @@ public class WGraph {
         while (queue.size() != 0) {
             currentNode = queue.poll();
 
-            if (isMatrix)  {
-                for (int i = 0; i < vertexCount; i++) {
-                    boolean n = matrix.get(currentNode.value - 1).get(i);
-                    if (n != false && !markedVertices[i]) {
-                        markedVertices[i] = true;
-                        Node newNode = new Node(i + 1, currentNode);
-                        queue.add(newNode);
-                        searchTree.add(newNode);
-                    }
-                }
-            } else {
-                // Collections.sort(array.get(currentNode.value - 1)); RESOLVER DPS
-                for (Pair<Integer, Float> i : array.get(currentNode.value - 1)) {
-                     if (!markedVertices[i.getKey() - 1]) {
-                        markedVertices[i.getKey() - 1] = true;
-                        Node newNode = new Node(i.getKey(), currentNode);
-                        queue.add(newNode);
-                        searchTree.add(newNode);
-                    }
+
+            // Collections.sort(array.get(currentNode.value - 1)); RESOLVER DPS
+            for (Pair<Integer, Float> i : array.get(currentNode.value - 1)) {
+                if (!markedVertices[i.getKey() - 1]) {
+                    markedVertices[i.getKey() - 1] = true;
+                    Node newNode = new Node(i.getKey(), currentNode);
+                    queue.add(newNode);
+                    searchTree.add(newNode);
                 }
             }
 
@@ -253,22 +239,12 @@ public class WGraph {
             System.out.println("tem neg");
         }
 
-        if (isMatrix) {
-            if (matrix.get(vertex1 - 1).get(vertex2 - 1) == false && vertex1 != vertex2) {
-                matrix.get(vertex1 - 1).set(vertex2 - 1, true);
-                matrix.get(vertex2 - 1).set(vertex1 - 1, true);
-                edgeCount++;
-                vertexDegrees[vertex1 - 1]++;
-                vertexDegrees[vertex2 - 1]++;
-            }
-        } else {
-            if (! array.get(vertex1 - 1).contains(vertex2) && vertex1 != vertex2) { // Tests if v1 and v2 are already connected
-                array.get(vertex1 - 1).add(new Pair<Integer, Float>(vertex2, weight));
-                array.get(vertex2 - 1).add(new Pair<Integer, Float>(vertex1, weight));
-                edgeCount++;
-                vertexDegrees[vertex1 - 1]++;
-                vertexDegrees[vertex2 - 1]++;
-            }
+        if (! array.get(vertex1 - 1).contains(vertex2) && vertex1 != vertex2) { // Tests if v1 and v2 are already connected
+            array.get(vertex1 - 1).add(new Pair<Integer, Float>(vertex2, weight));
+            array.get(vertex2 - 1).add(new Pair<Integer, Float>(vertex1, weight));
+            edgeCount++;
+            vertexDegrees[vertex1 - 1]++;
+            vertexDegrees[vertex2 - 1]++;
         }
     }
 
@@ -320,8 +296,11 @@ public class WGraph {
 
         PriorityQueue<Pair<Integer, Float>> queue = new PriorityQueue<>((v1, v2) -> Math.round(10000*v1.getValue()) - Math.round(10000*v2.getValue()));
         queue.add(new Pair<Integer, Float>(s, 0f));
-
+        //int i = 0;
         while (queue.size() > 0) {
+            //i++;
+            //if (i%10000 == 0)
+            //System.out.println(queue.size());
             int u = queue.poll().getKey()-1;
             //System.out.println(u);
 
@@ -371,17 +350,19 @@ public class WGraph {
             }
             System.out.print("\n\n");
         } else {
+            /*
             System.out.println("\nDistances between vertex " + (s) + " and all vertices, along with their paths:\n");
             for (int vertex = 1; vertex <= vertexCount; vertex++) {
-                //if (vertex == 10 || vertex == 20 || vertex == 30 || vertex == 40 || vertex == 50){
+                if (vertex == 717737 || vertex == 471365 || vertex == 5709 || vertex == 11386 || vertex == 343930){
                 System.out.println("Distance to vertex " + (vertex) + " = " + dist[vertex-1]);
                 System.out.print("Path to vertex " + (vertex) + ": ");
                 for (Integer node : GetPathDijkstra(vertex, parents)) {
                     System.out.print(" > "+ (node));
                 }
                 System.out.print("\n\n");
-                //}
+                }
             }
+            */
         }
         
 
@@ -403,7 +384,6 @@ public class WGraph {
 
         for (int i = 0; i < vertexCount; i++) { // Goes through all vertices in the graph
             int u = MinDistance(dist, explored); // Chooses the not yet explored vertex with minimum distance
-            System.out.println(u);
 
             explored[u] = true;
 
@@ -503,7 +483,7 @@ public class WGraph {
                         // Update parent
                         parents[v-1] = edge.getKey();
 
-                        System.out.println(Arrays.toString(path.toArray()) + " after, v = " + v + ", i = " + i);
+                        //System.out.println(Arrays.toString(path.toArray()) + " after, v = " + v + ", i = " + i);
                     }
                 }
             }
@@ -536,14 +516,14 @@ public class WGraph {
             System.out.print("\n\n");
         } else {
             System.out.println("\nDistances between vertex " + (target) + " and all vertices, along with their paths:\n");
-            for (int vertex = 1; vertex <= vertexCount; vertex++) {
+            /*for (int vertex = 1; vertex <= vertexCount; vertex++) {
                 System.out.println("Distance to vertex " + (vertex) + " = " + dist[vertex-1]);
                 System.out.print("Path to vertex " + (vertex) + ": ");
                 for (Integer node : path.get(vertex-1) ) {
                     System.out.print(" > "+ (node));
                 }
                 System.out.print("\n\n");
-            }
+            }*/
         }
         
         /*
@@ -641,9 +621,24 @@ public class WGraph {
 
 
     public static void main(String[] args) {
-        WGraph myGraph = new WGraph(false);
-        myGraph.DistanceAll(1);
+        WGraph myGraph = new WGraph();
+        //myGraph.DistanceAll(2722);
         //myGraph.PrimMST();
+        
+        Random gerador = new Random();
+        long[] timeTaken = new long[100];
+        long totalTime = 0;
+        for (int index = 0; index < 100; index++) {
+            long time1 = System.nanoTime();
+            myGraph.DistanceAll(gerador.nextInt(myGraph.vertexCount+1));
+            long time2 = System.nanoTime();
+            timeTaken[index] = time2 - time1;
+            totalTime += time2 - time1;
+            System.out.println("Time taken " + timeTaken[index] + " ns");
+            
+        }
+        System.out.println(totalTime);
+        System.out.println(myGraph.hasNegativeWeight);
         
     }
 

@@ -1,4 +1,4 @@
-# Graph Library
+# Graph Module
 
 This is a library for graph manipulation. The chosen language was Java because we were interested in gaining experience in object-oriented programming. The library was designed in the form of a class, which can easily be used by other programs.
 
